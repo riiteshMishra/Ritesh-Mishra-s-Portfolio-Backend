@@ -1,3 +1,4 @@
+console.log(":: Shree Ganeshay namah ::");
 const express = require("express");
 const app = express();
 require("dotenv").config();
@@ -21,7 +22,7 @@ app.use(
 );
 
 // 5) Routes
-app.use("/api/v1", userRoutes);
+app.use("/api/v1/auth", userRoutes);
 app.get("/", (req, res) => {
   res.send("You're going very well...");
 });
