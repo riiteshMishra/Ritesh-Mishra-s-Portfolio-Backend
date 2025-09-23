@@ -3,17 +3,17 @@ const nodemailer = require("nodemailer");
 exports.mailSender = async (email, title, body) => {
   try {
     let transporter = nodemailer.createTransport({
-      host: process.env.MailHost,
+      host: process.env.MAIL_HOST,
       port: 465,
-      secure: process.env.MailSecure === "true",
+      secure: process.env.MAIL_SECURE === "true",
       auth: {
-        user: process.env.MailUser,
-        pass: process.env.MailPass,
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
       },
     });
 
     let info = await transporter.sendMail({
-      from: ` <${process.env.MailUser}>`,
+      from: ` <${process.env.MAIL_USER}>`,
       to: email,
       subject: title,
       html: body,

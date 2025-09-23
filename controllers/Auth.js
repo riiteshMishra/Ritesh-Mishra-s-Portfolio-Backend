@@ -3,7 +3,7 @@ const OTP = require("../models/Otp");
 const User = require("../models/User");
 const Profile = require("../models/Profile");
 const bcrypt = require("bcrypt");
-
+const jwt = require("jsonwebtoken");
 // send otp
 exports.sendOtp = async (req, res) => {
   try {
@@ -31,7 +31,7 @@ exports.sendOtp = async (req, res) => {
 };
 
 // sign-up
-exports.signUp = async (req, res) => {
+exports.signup = async (req, res) => {
   try {
     // data fetch
     let {
@@ -149,6 +149,87 @@ exports.signUp = async (req, res) => {
       message: "Internal server error",
       error: err.message,
       path: "./controllers/sign-up",
+    });
+  }
+};
+
+//log-in
+exports.login = async (req, res) => {
+  try {
+    // data fetch
+    let { email, password } = req.body;
+
+    // sanitization
+    email = email.toString().toLowerCase().trim();
+    password = password.trim();
+    console.log(email, password);
+
+    // validation
+    if (!email || !password)
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+
+    // user ko find
+    const user = await User.findOne({ email }).populate("profile");
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "user not exist , please sing-up",
+      });
+
+    const payload = {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      accountType: user.accountType,
+    };
+
+    // Password check
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid Password",
+      });
+    }
+
+    // JWT generate
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // return res.status(200).json({
+    //   success: true,
+    //   message: "Login successful",
+    //   token,
+    //   user,
+    // });
+    const options = {
+      httpOnly: true,
+      secure: false, // production me true krna hai
+      sameSite: "strict",
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    };
+
+    // password hide kardo
+    user.password = undefined;
+    
+    // with cookie response
+    return res.cookie("token", token, options).status(200).json({
+      success: true,
+      message: "Login successful",
+      token: token,
+      user: user,
+    });
+  } catch (err) {
+    console.log("ERROR WHILE LOGIN", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: err.message,
+      path: "./controllers/login",
     });
   }
 };

@@ -5,6 +5,7 @@ require("dotenv").config();
 const fileUpload = require("express-fileupload");
 const { connectDb } = require("./config/database");
 const userRoutes = require("./routes/user");
+const cookieParser = require("cookie-parser");
 
 // 2) App Config
 const PORT = process.env.PORT || 4000;
@@ -14,6 +15,8 @@ connectDb();
 
 // 4) Middlewares
 app.use(express.json());
+app.use(cookieParser());
+
 app.use(
   fileUpload({
     useTempFiles: true,
