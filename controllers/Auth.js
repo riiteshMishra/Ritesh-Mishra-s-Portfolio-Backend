@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const OTP = require("../models/Otp");
 const User = require("../models/User");
 const Profile = require("../models/Profile");
@@ -71,7 +70,7 @@ exports.signup = async (req, res) => {
     if (password !== confirmPassword)
       return res.status(400).json({
         success: false,
-        message: "confirm password do not matched",
+        message: "Confirm password does not match",
       });
 
     // agar user pahale se signup hoga to return ho jao
@@ -162,7 +161,6 @@ exports.login = async (req, res) => {
     // sanitization
     email = email.toString().toLowerCase().trim();
     password = password.trim();
-    console.log(email, password);
 
     // validation
     if (!email || !password)
@@ -215,7 +213,7 @@ exports.login = async (req, res) => {
 
     // password hide kardo
     user.password = undefined;
-    
+
     // with cookie response
     return res.cookie("token", token, options).status(200).json({
       success: true,
@@ -230,6 +228,73 @@ exports.login = async (req, res) => {
       message: "Internal server error",
       error: err.message,
       path: "./controllers/login",
+    });
+  }
+};
+
+//change-password
+exports.changePassword = async (req, res) => {
+  try {
+    // some one is escaping authorization
+    if (!req.user)
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized. Token not found or invalid",
+      });
+    // data fetched
+    let { oldPassword, newPassword } = req.body;
+
+    const userId = req.user.id;
+    // validation
+    if (!oldPassword || !newPassword || !userId)
+      return res.status(404).json({
+        success: false,
+        message: "All fields are required",
+      });
+
+    // userId by middle ware -- user from database
+    const user = await User.findById(userId);
+    // some one is escaping authorization
+    if (!user)
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized. user not found",
+      });
+
+    //data sanitized
+    oldPassword = oldPassword.trim();
+    newPassword = newPassword.trim();
+
+    // agar same password send ho to
+    if (oldPassword === newPassword)
+      return res.status(400).json({
+        success: false,
+        message: "New password cannot be same as old password",
+      });
+    // match old and password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch)
+      return res.status(400).json({
+        success: false,
+        message: "Old password do not matched",
+      });
+
+    const updatedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = updatedPassword;
+    await user.save();
+    // return success message
+    return res.status(200).json({
+      success: true,
+      message: "Your password is updated now",
+    });
+  } catch (err) {
+    console.log("ERROR WHILE CHANGING PASSWORD", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while changing password",
+      error: err.message,
+      path: "/controllers/change-password",
     });
   }
 };

@@ -5,6 +5,7 @@ require("dotenv").config();
 const fileUpload = require("express-fileupload");
 const { connectDb } = require("./config/database");
 const userRoutes = require("./routes/user");
+const profileRoutes = require("./routes/profile");
 const cookieParser = require("cookie-parser");
 
 // 2) App Config
@@ -26,6 +27,7 @@ app.use(
 
 // 5) Routes
 app.use("/api/v1/auth", userRoutes);
+app.use("/api/v1/profile", profileRoutes);
 app.get("/", (req, res) => {
   res.send("You're going very well...");
 });
