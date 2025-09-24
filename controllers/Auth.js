@@ -3,6 +3,9 @@ const User = require("../models/User");
 const Profile = require("../models/Profile");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { mailSender } = require("../utils/mailSender");
+const { forgotPasswordTemplate } = require("../emailTemplates/forgot_password");
 // send otp
 exports.sendOtp = async (req, res) => {
   try {
@@ -189,7 +192,7 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid Password",
+        message: "Wrong  Password",
       });
     }
 
@@ -295,6 +298,121 @@ exports.changePassword = async (req, res) => {
       message: "Internal server error while changing password",
       error: err.message,
       path: "/controllers/change-password",
+    });
+  }
+};
+
+//generate reset-password-token
+exports.generateResetPasswordToken = async (req, res) => {
+  try {
+    // data fetch
+    let { email } = req.body;
+
+    //validation
+    email = email.toString().toLowerCase().trim();
+
+    //check
+    const user = await User.findOne({
+      email: email,
+    });
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+
+    // reset password token generate
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    // reset password token expiry
+    user.resetPasswordExpire = Date.now() + 1 * 60 * 1000;
+
+    // save user
+    await user.save();
+
+    // create reset link
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    // send reset password token to user via email
+    await mailSender(
+      email,
+      "For resetting your password",
+      forgotPasswordTemplate(email, resetUrl)
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Reset password token sent to your email",
+      url: resetUrl,
+    });
+  } catch (err) {
+    console.log("ERROR WHILE RESETTING PASSWORD", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while resetting password",
+      error: err.message,
+      path: "./controllers/auth/generate-reset-password",
+    });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    // token validation
+    let { token } = req.params;
+    token = token.trim();
+    const { password } = req.body;
+    if (!token)
+      return res.status(404).json({
+        success: false,
+        message: "Token not found",
+      });
+    if (!password)
+      return res.status(400).json({
+        success: false,
+        message: "New password is required",
+      });
+
+    //hashed token
+    // hashed token
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    // user side
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not fund or token not matched",
+      });
+
+    // agar user mil gya to
+    const HashedPassword = await bcrypt.hash(password, 10);
+    user.password = HashedPassword;
+    await user.save();
+
+    // clear reset fields
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    // success response
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (err) {
+    console.log("ERROR WHILE VALIDATING RESET PASSWORD TOKEN", { err });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while validating reset password token",
+      error: err.message,
     });
   }
 };

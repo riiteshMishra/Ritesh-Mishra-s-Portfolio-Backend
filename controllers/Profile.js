@@ -32,7 +32,7 @@ exports.updateProfile = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid date of birth" });
 
-    if (bio && bio.length > 500)
+    if (bio && bio.length > 150)
       return res.status(400).json({ success: false, message: "Bio too long" });
 
     if (contactNumber && !/^\d{10}$/.test(contactNumber))

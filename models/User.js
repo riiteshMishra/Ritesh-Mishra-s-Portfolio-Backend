@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Profile",
     },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
     // blogs:{
     //   type:mongoose.Types.ObjectId,
 

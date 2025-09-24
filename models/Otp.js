@@ -2,24 +2,27 @@ const mongoose = require("mongoose");
 const { mailSender } = require("../utils/mailSender");
 const { signUpOtpTemplate } = require("../emailTemplates/signupTemplate");
 
-const otpSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true,
+const otpSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+    otp: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      expires: 300,
+    },
   },
-  otp: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    expires: 300,
-  },
-});
+  { timestamps: true }
+);
 
 otpSchema.post("save", async function (doc) {
   try {
