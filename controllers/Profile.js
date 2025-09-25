@@ -1,5 +1,7 @@
 const User = require("../models/User");
 const Profile = require("../models/Profile");
+const AppError = require("../utils/appError");
+const Blog = require("../models/Blogs");
 
 exports.updateProfile = async (req, res) => {
   try {
@@ -84,11 +86,11 @@ exports.updateProfile = async (req, res) => {
         message: "Profile not found",
       });
 
-   return res.status(200).json({
-     success: true,
-     message: "Profile updated successfully",
-     profile: updatedProfile,
-   });
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      profile: updatedProfile,
+    });
   } catch (err) {
     console.log("ERROR WHILE UPDATING PROFILE", err);
     return res.status(500).json({
@@ -97,5 +99,87 @@ exports.updateProfile = async (req, res) => {
       error: err.message,
       path: "./controllers/Profile/updateProfile",
     });
+  }
+};
+
+// delete account
+exports.deleteAccount = async (req, res, next) => {
+  try {
+    let accountId = req.user.id;
+    const userName = `${req.user.firstName} ${req.user.lastName}`;
+    if (!accountId) return next(new AppError("Account Id is required", 400));
+
+    //find in db
+    const user = await User.findById(accountId).populate("profile blogs");
+    if (!user) return next(new AppError("User not found", 404));
+
+    // delete blogs created by this user
+    if (user.blogs && user.blogs.length > 0) {
+      for (let blog of user.blogs) {
+        await Blog.findByIdAndDelete(blog._id);
+      }
+    }
+
+    if (user.profile) await Profile.findByIdAndDelete(user.profile._id);
+
+    // Delete user account
+    await User.findByIdAndDelete(accountId);
+    return res.status(200).json({
+      success: true,
+      message: `Goodbye ${userName} your account is deleted permanently`,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
+
+// admin only
+exports.findAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({
+      accountType: "Client",
+    }).select({
+      firstName: 1,
+      lastName: 1,
+      email: 1,
+    });
+
+    if (users.length === 0)
+      return next(new AppError("We have not any clients at the moment"));
+
+    return res.status(200).json({
+      success: true,
+      message: `All users founded ${users.length}`,
+      data: users,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
+
+// authorized route :- get user details
+exports.getUserDetails = async (req, res, next) => {
+  try {
+    // get user form req.body
+    const userId = req.user.id;
+
+    // Validation
+    if (!userId) return next(new AppError("User id not found", 400));
+
+    // find user by id
+    const user = await User.findById(userId)
+      .populate("profile")
+      .select("-password")
+      .populate("blogs");
+    if (!user) return next(new AppError("User not found", 404));
+
+    //return response
+    return res.status(200).json({
+      success: true,
+      message: "User details fetched successfully",
+      user,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
   }
 };

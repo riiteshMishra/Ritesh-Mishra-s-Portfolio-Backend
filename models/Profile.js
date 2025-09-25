@@ -19,7 +19,13 @@ const profileSchema = new mongoose.Schema(
       github: { type: String, trim: true },
     },
     interests: [String],
-    website: { type: String, trim: true },
+    likedBlogs: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Blog",
+      },
+    ],
+    
   },
   { timestamps: true }
 );

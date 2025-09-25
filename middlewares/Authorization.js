@@ -40,14 +40,19 @@ exports.auth = async (req, res, next) => {
 exports.isAdmin = async (req, res, next) => {
   try {
     // some one is escaping authorization
-    if (!req.user)
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized. Token not found or invalid",
-      });
+    // if (!req.user)
+    //   return res.status(401).json({
+    //     success: false,
+    //     message: "Unauthorized. Token not found or invalid",
+    //   });
 
     const userId = req.user.id;
-    console.log("req.user", req.user);
+       if (!userId)
+         return res.status(400).json({
+           success: false,
+           message: "Toke not found",
+         });
+    // console.log("req.user", req.user);
     const user = await User.findById(userId);
 
     //     account type match
@@ -63,23 +68,28 @@ exports.isAdmin = async (req, res, next) => {
       success: false,
       message: "Internal server error while validating user",
       error: err.message,
-      path: "./middlewares/Authorization",
+      path: "./middlewares/Authorization/isAdmin",
     });
   }
 };
 
-// isAdmin
+// isClient
 exports.isClient = async (req, res, next) => {
   try {
     // some one is escaping authorization
-    if (!req.user)
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized. Token not found or invalid",
-      });
+    // if (!req.user)
+    //   return res.status(401).json({
+    //     success: false,
+    //     message: "Unauthorized. Token not found or invalid",
+    //   });
 
     const userId = req.user.id;
-    console.log("req.user", req.user);
+    if (!userId)
+      return res.status(400).json({
+        success: false,
+        message: "Toke not found",
+      });
+    // console.log("req.user", req.user);
     const user = await User.findById(userId);
 
     //     account type match
