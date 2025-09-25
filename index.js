@@ -1,6 +1,7 @@
 console.log(":: Shree Ganeshay namah ::");
 const express = require("express");
 const app = express();
+const cors = require("cors");
 require("dotenv").config();
 const fileUpload = require("express-fileupload");
 const { connectDb } = require("./config/database");
@@ -19,6 +20,28 @@ connectDb();
 // 4) Middlewares
 app.use(express.json());
 app.use(cookieParser());
+
+// Allowed origin
+const allowedOrigins = [
+  // "http://localhost:3000",
+  "https://ritesh-mishra-s-portfolio-frondtend.vercel.app",
+];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Agar request ka origin allowed list me hai ya origin undefined hai (postman jaise tools ke liye)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 
 app.use(
   fileUpload({
