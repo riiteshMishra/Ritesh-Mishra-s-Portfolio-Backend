@@ -10,7 +10,7 @@ const profileRoutes = require("./routes/profile");
 const cookieParser = require("cookie-parser");
 const errorHandler = require("./middlewares/ErrorHandler");
 const categoryRoutes = require("./routes/Category");
-
+const projectsRoutes = require("./routes/projects");
 // 2) App Config
 const PORT = process.env.PORT || 4000;
 
@@ -23,8 +23,8 @@ app.use(cookieParser());
 
 // Allowed origin
 const allowedOrigins = [
-  // "http://localhost:3000",
-  "https://ritesh-mishra-s-portfolio-frondtend.vercel.app",
+  "http://localhost:3000",
+  // "https://ritesh-mishra-s-portfolio-frondtend.vercel.app",
 ];
 app.use(
   cors({
@@ -42,7 +42,6 @@ app.use(
   })
 );
 
-
 app.use(
   fileUpload({
     useTempFiles: true,
@@ -54,6 +53,7 @@ app.use(
 app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/category", categoryRoutes);
+app.use("/api/v1/projects", projectsRoutes);
 app.get("/", (req, res) => {
   res.send("You're going very well...");
 });

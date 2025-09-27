@@ -34,6 +34,13 @@ const userSchema = new mongoose.Schema(
         ref: "Blog",
       },
     ],
+    // projects
+    projects: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Projects",
+      },
+    ],
   },
   { timestamps: true }
 );
