@@ -25,13 +25,13 @@ const blogSchema = new mongoose.Schema(
 
     author: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // blog kisne likha hai
+      ref: "User",
       required: true,
     },
 
-    categories: {
-      type: [String],
-      default: [],
+    category: {
+      type: mongoose.Types.ObjectId,
+      required: true,
     },
 
     tags: {

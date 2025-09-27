@@ -11,6 +11,8 @@ const cookieParser = require("cookie-parser");
 const errorHandler = require("./middlewares/ErrorHandler");
 const categoryRoutes = require("./routes/Category");
 const projectsRoutes = require("./routes/projects");
+const blogRoutes = require("./routes/blog");
+
 // 2) App Config
 const PORT = process.env.PORT || 4000;
 
@@ -54,11 +56,11 @@ app.use("/api/v1/auth", userRoutes);
 app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/projects", projectsRoutes);
-app.get("/", (req, res) => {
-  res.send("You're going very well...");
-});
+app.use("/api/v1/blogs", blogRoutes);
+
 
 app.use(errorHandler);
+
 // 6) Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
