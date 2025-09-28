@@ -25,7 +25,7 @@ app.use(cookieParser());
 
 // Allowed origin
 const allowedOrigins = [
-  "http://localhost:3000",
+  "http://localhost:5173",
   // "https://ritesh-mishra-s-portfolio-frondtend.vercel.app",
 ];
 app.use(
@@ -57,7 +57,6 @@ app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/projects", projectsRoutes);
 app.use("/api/v1/blogs", blogRoutes);
-
 
 app.use(errorHandler);
 

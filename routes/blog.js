@@ -5,12 +5,27 @@ const {
   updateBlogs,
   deleteBlog,
   findAllBlogs,
+  likeBLogs,
+  commentOnBlog,
+  updateComment,
+  deleteComment,
+  dislikeBlog,
 } = require("../controllers/Blogs");
 const router = express.Router();
 
+// blog crud operations
 router.post("/create-blog", auth, isAdmin, createBlog);
 router.put("/update-blog", auth, isAdmin, updateBlogs);
-router.delete("/delete-blog", auth, isAdmin, deleteBlog);
+router.delete("/delete-blog/:blogId", auth, isAdmin, deleteBlog);
 router.get("/get-all-blogs", findAllBlogs);
+
+// comment
+router.post("/blog/:blogId/comment", auth, commentOnBlog);
+router.put("/update-comment/:blogId", auth, updateComment);
+router.delete("/delete-comment", auth, deleteComment);
+
+// likes
+router.post("/like-blog/:blogId", auth, likeBLogs);
+router.post("/dislike-blog/:blogId", auth, dislikeBlog);
 
 module.exports = router;
