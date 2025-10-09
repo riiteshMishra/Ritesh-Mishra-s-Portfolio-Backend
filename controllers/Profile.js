@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Profile = require("../models/Profile");
 const AppError = require("../utils/appError");
 const Blog = require("../models/Blogs");
+const mongoose = require("mongoose");
 
 exports.updateProfile = async (req, res) => {
   try {
@@ -178,6 +179,37 @@ exports.getUserDetails = async (req, res, next) => {
       success: true,
       message: "User details fetched successfully",
       user,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
+
+// Admin blogs
+exports.userBlogs = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    if (!userId) return next(new AppError("User Id not found", 400));
+
+    if (!mongoose.Types.ObjectId.isValid(userId))
+      return next(new AppError("Invalid user id."));
+    // find user form userID
+    const user = await User.findById(userId);
+    if (!user) return next(new AppError("User Not Found", 404));
+
+    // all blogs by this user
+    const blogs = await Blog.find({ author: userId });
+
+    if (blogs.length === 0)
+      return res.status(200).json({
+        success: true,
+        message: "Currently you have not created any blog,",
+      });
+
+    return res.status(200).json({
+      success: true,
+      message: "All blogs by you fetched successfully",
+      blog: blogs,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));

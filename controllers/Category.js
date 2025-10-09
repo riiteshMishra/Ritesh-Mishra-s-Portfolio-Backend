@@ -69,7 +69,6 @@ exports.updateCategory = async (req, res, next) => {
     if (duplicateCategory)
       return next(new AppError("We cannot update to duplicate category", 400));
 
-
     // find that category
     const category = await Category.findById(categoryId);
     if (!category) return next(new AppError("Category not found", 404));
@@ -131,7 +130,7 @@ exports.allCategories = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "All Categories founded",
-      data: allCategories,
+      allCategories,
     });
   } catch (err) {
     return next(new AppError(err.message, 500, req.originalUrl));

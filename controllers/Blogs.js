@@ -14,13 +14,13 @@ exports.createBlog = async (req, res, next) => {
     let { title, slug, content, categoryId, tags, isPublished } = req.body;
     console.log("REQ.BODY", req.body);
     //validation
-    if (!title || !slug || !content || !categoryId)
+    if (!title || !slug || !content || !categoryId || !tags)
       return next(new AppError("All fields are required"));
 
     // Thumbnail
     let { thumbnail } = req.files;
     if (!thumbnail) return next(new AppError("Thumbnail is required", 400));
-    thumbnail = await uploadFileToCloudinary(thumbnail).url;
+    thumbnail = await uploadFileToCloudinary(thumbnail);
 
     // input data sanitize
     title = title.toString().toLowerCase().trim();
@@ -50,7 +50,7 @@ exports.createBlog = async (req, res, next) => {
       tags: tags,
       isPublished: isPublished,
       author: user._id,
-      thumbnail: thumbnail,
+      thumbnail: thumbnail.url,
     });
 
     // update category
@@ -62,6 +62,9 @@ exports.createBlog = async (req, res, next) => {
       { new: true }
     );
 
+    // user ke blogs array me blog ki id push
+    user.blogs.push(blog._id);
+    await user.save();
     return res.status(200).json({
       success: true,
       message: "Blog created successfully",
@@ -77,7 +80,8 @@ exports.updateBlogs = async (req, res, next) => {
   try {
     // console.log("REQ.BODY", req.body);
     if (!req.user.id) return next(new AppError("Unauthorized user not found"));
-    const { blogId, title, slug, content, categoryId, tags } = req.body;
+    const { blogId, title, slug, content, categoryId, tags, isPublished } =
+      req.body;
 
     if (!blogId) return next(new AppError("Blog id required", 400));
 
@@ -90,7 +94,7 @@ exports.updateBlogs = async (req, res, next) => {
     if (slug) blog.slug = slug.toString().toLowerCase().trim();
     if (content) blog.content = content.toString().trim();
     if (categoryId) blog.category = categoryId.toString().trim();
-
+    if (isPublished) blog.isPublished = isPublished;
     if (tags) {
       if (Array.isArray(tags)) {
         blog.tags = tags.map((t) => t.toLowerCase().trim());
@@ -152,7 +156,10 @@ exports.deleteBlog = async (req, res, next) => {
 // find all blogs
 exports.findAllBlogs = async (req, res, next) => {
   try {
-    const allBlogs = await Blog.find().populate("author", "name email");
+    const allBlogs = await Blog.find({ isPublished: true }).populate(
+      "author",
+      "name email"
+    );
 
     if (allBlogs.length === 0)
       return next(new AppError("Currently we don't have any blog", 404));
