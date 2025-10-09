@@ -354,3 +354,31 @@ exports.deleteComment = async (req, res, next) => {
     return next(new AppError(err.message, 500));
   }
 };
+
+// get blog details by id
+exports.getBlogDetails = async (req, res, next) => {
+  try {
+    const { blogId } = req.params;
+    // validation
+    if (!mongoose.Types.ObjectId.isValid(blogId))
+      return next(new AppError("Invalid blog Id", 400));
+
+    // find blog in db
+    const blog = await Blog.findById(blogId).populate({
+      path: "author",
+      select: "firstName lastName",
+    });
+
+    // blog not found?
+    if (!blog) return next(new AppError("Blog not found", 404));
+
+    // return response
+    return res.status(200).json({
+      success: true,
+      message: "Blog details fetched successful",
+      blog,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};

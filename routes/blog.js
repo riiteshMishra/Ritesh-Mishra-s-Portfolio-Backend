@@ -10,6 +10,7 @@ const {
   updateComment,
   deleteComment,
   dislikeBlog,
+  getBlogDetails,
 } = require("../controllers/Blogs");
 const { userBlogs } = require("../controllers/Profile");
 const router = express.Router();
@@ -20,6 +21,7 @@ router.put("/update-blog", auth, isAdmin, updateBlogs);
 router.delete("/delete-blog/:blogId", auth, isAdmin, deleteBlog);
 router.get("/get-all-blogs", findAllBlogs);
 router.get("/user-blogs", auth, isAdmin, userBlogs);
+router.get("/blog-details/:blogId", getBlogDetails);
 
 // comment
 router.post("/blog/:blogId/comment", auth, commentOnBlog);
