@@ -41,6 +41,12 @@ const userSchema = new mongoose.Schema(
         ref: "Projects",
       },
     ],
+    likedBlogs: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Blog",
+      },
+    ],
   },
   { timestamps: true }
 );

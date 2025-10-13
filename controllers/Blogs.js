@@ -174,77 +174,48 @@ exports.findAllBlogs = async (req, res, next) => {
   }
 };
 
-// blog like
-exports.likeBLogs = async (req, res, next) => {
+exports.toggleBlogLike = async (req, res, next) => {
   try {
-    // data fetch
     const { blogId } = req.params;
     const userId = req.user.id;
 
-    // blog id validation
+    // Validate blogId
     if (!mongoose.Types.ObjectId.isValid(blogId))
       return next(new AppError("Invalid blogId", 400));
 
-    // validation
-    if (!userId) return next(new AppError("User id not found", 400));
+    // Validate userId
+    if (!userId) return next(new AppError("User not found", 400));
 
-    // find that blog and user in db
+    // Fetch blog and user
     const blog = await Blog.findById(blogId);
     const user = await User.findById(userId);
-
-    if (!blog) return next(new AppError("Blog not found.", 404));
+    if (!blog) return next(new AppError("Blog not found", 404));
     if (!user) return next(new AppError("User not found", 404));
 
-    // update blog likes
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      blogId,
-      {
-        $addToSet: { likes: userId },
-      },
-      { new: true }
-    );
+    // Check if user already liked
+    const hasLiked = blog.likes.includes(userId);
+
+    if (hasLiked) {
+      // Unlike
+      blog.likes.pull(userId);
+      user.likedBlogs.pull(blogId);
+    } else {
+      // Like
+      blog.likes.push(userId);
+      user.likedBlogs.push(blogId);
+    }
+
+    await blog.save();
+    await user.save();
+
     return res.status(200).json({
       success: true,
-      message: "Liked successfully",
+      liked: !hasLiked,
+      likesCount: blog.likes.length,
+      message: hasLiked ? "Unliked successfully" : "Liked successfully",
     });
   } catch (err) {
     next(new AppError(err.message, 500));
-  }
-};
-
-// dislike blog
-exports.dislikeBlog = async (req, res, next) => {
-  try {
-    const { blogId } = req.params;
-    const userId = req.user.id;
-
-    // object id validation
-    if (!mongoose.Types.ObjectId.isValid(blogId))
-      return next(new AppError("Invalid blog id"));
-    if (!mongoose.Types.ObjectId.isValid(userId))
-      return next(new AppError("Invalid user id"));
-
-    // find that blog and user by id
-    const user = await User.findById(userId);
-    const blog = await Blog.findById(blogId);
-
-    if (!user) return next(new AppError("User not found", 404));
-    if (!blog) return next(new AppError("Blog not found", 404));
-
-    // dislike that blog
-    await Blog.findByIdAndUpdate(
-      blogId,
-      { $pull: { likes: userId } },
-      { new: true }
-    );
-
-    // return response
-    return res.status(200).json({
-      success: true,
-      message: "Like removed",
-    });
-  } catch (err) {
-    return next(new AppError(err.message, 500));
   }
 };
 
@@ -364,10 +335,15 @@ exports.getBlogDetails = async (req, res, next) => {
       return next(new AppError("Invalid blog Id", 400));
 
     // find blog in db
-    const blog = await Blog.findById(blogId).populate({
-      path: "author",
-      select: "firstName lastName",
-    });
+    const blog = await Blog.findById(blogId)
+      .populate({
+        path: "author",
+        select: "firstName lastName",
+      })
+      .populate({
+        path: "comments.user",
+        select: "firstName lastName",
+      });
 
     // blog not found?
     if (!blog) return next(new AppError("Blog not found", 404));
@@ -382,3 +358,40 @@ exports.getBlogDetails = async (req, res, next) => {
     return next(new AppError(err.message, 500));
   }
 };
+
+// Get blog likes array
+exports.getLikedBlogs = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return next(new AppError("Invalid user ID", 400));
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return next(new AppError("User not found", 404));
+
+    // Filter out invalid IDs
+    const validBlogIds = user.likedBlogs.filter((id) =>
+      mongoose.Types.ObjectId.isValid(id)
+    );
+
+    if (validBlogIds.length === 0) {
+      return res.status(200).json({ success: true, likedBlogsDetails: [] });
+    }
+
+    // Fetch all liked blogs (optional populate + sort)
+    const likedBlogsDetails = await Blog.find({ _id: { $in: validBlogIds } })
+      .select("title thumbnail content author")
+      .populate("author", "firstName lastName image")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      likedBlogsDetails,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
+
