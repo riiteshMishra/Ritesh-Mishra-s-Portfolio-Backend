@@ -49,14 +49,14 @@ exports.contactUs = async (req, res, next) => {
       "A client raised a request",
       clientRequest(formData)
     );
-  return res.status(201).json({
-    success: true,
-    message:
-      "Thank you! Your request has been received. Our team will review it and get back to you shortly.",
-    formData,
-  });
-
+    return res.status(201).json({
+      success: true,
+      message:
+        "Thank you! Your request has been received. Our team will review it and get back to you shortly.",
+      formData,
+    });
   } catch (err) {
+    console.log("Error while sending your request", err);
     return next(new AppError(err.message, 500));
   }
 };

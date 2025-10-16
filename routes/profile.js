@@ -14,6 +14,7 @@ const {
   getAllRequests,
   updateStatus,
 } = require("../controllers/Contact-us");
+const { uploadFileToCloudinary } = require("../utils/fileUploader");
 const router = express.Router();
 
 router.post("/update-profile", auth, updateProfile);
@@ -28,18 +29,25 @@ router.get("/client-requests", auth, isAdmin, getAllRequests);
 router.post("/form-status-update", auth, isAdmin, updateStatus);
 
 // local file upload and get cloud link
-router.post("/upload-file", auth, isAdmin, (req, res, next) => {
+router.post("/upload-file", auth, isAdmin, async (req, res, next) => {
   try {
-    const { file } = req.files;
+    const file = req.files?.file;
+    if (!file) {
+      return next(new AppError("File must be required", 400));
+    }
 
+    // Upload file to Cloudinary
+    const uploadedFile = await uploadFileToCloudinary(file, 50);
+
+    // Send response
     return res.status(200).json({
       success: true,
-      message: "file uploaded",
-      file,
+      message: "File uploaded successfully",
+      uploadFile: uploadedFile?.url,
     });
   } catch (err) {
-    console.log("error while uploading file", err);
-    return next(new AppError(err.message, 500));
+    console.error("Error while uploading file:", err);
+    return next(new AppError(err.message || "File upload failed", 500));
   }
 });
 
