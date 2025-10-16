@@ -17,6 +17,7 @@ const profileSchema = new mongoose.Schema(
       linkedin: { type: String, trim: true },
       x: { type: String, trim: true },
       github: { type: String, trim: true },
+      instagram: { type: String, trim: true },
     },
     interests: [String],
     likedBlogs: [
@@ -25,7 +26,10 @@ const profileSchema = new mongoose.Schema(
         ref: "Blog",
       },
     ],
-    
+    website: {
+      type: String,
+      trim: true,
+    },
   },
   { timestamps: true }
 );

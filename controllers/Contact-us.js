@@ -3,6 +3,8 @@ const AppError = require("../utils/appError");
 const mongoose = require("mongoose");
 const { mailSender } = require("../utils/mailSender");
 const { requestUpdate } = require("../emailTemplates/request_updated");
+const { clientRequest } = require("../emailTemplates/clientRequest");
+require("dotenv").config();
 
 // Create Contact Request
 exports.contactUs = async (req, res, next) => {
@@ -42,11 +44,18 @@ exports.contactUs = async (req, res, next) => {
       message,
     });
 
-    return res.status(201).json({
-      success: true,
-      message: "Form submitted successfully",
-      formData,
-    });
+    await mailSender(
+      process.env.MAIL_USER,
+      "A client raised a request",
+      clientRequest(formData)
+    );
+  return res.status(201).json({
+    success: true,
+    message:
+      "Thank you! Your request has been received. Our team will review it and get back to you shortly.",
+    formData,
+  });
+
   } catch (err) {
     return next(new AppError(err.message, 500));
   }

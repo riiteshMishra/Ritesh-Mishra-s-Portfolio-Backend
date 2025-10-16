@@ -2,7 +2,7 @@ require("dotenv").config();
 const cloudinary = require("../config/cloudinary");
 const cloudFolder = process.env.CLOUDINARY_FOLDER;
 
-exports.uploadFileToCloudinary = async (file) => {
+exports.uploadFileToCloudinary = async (file, quality) => {
   try {
     const options = {
       folder: cloudFolder,
@@ -10,7 +10,7 @@ exports.uploadFileToCloudinary = async (file) => {
       unique_filename: false,
       overwrite: true,
       // use_filename: true,
-      transformation: [{ quality: "auto" , fetch_format: "auto" }],
+      transformation: [{ quality: quality || "auto", fetch_format: "auto" }],
     };
 
     const response = await cloudinary.uploader.upload(

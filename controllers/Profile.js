@@ -3,6 +3,7 @@ const Profile = require("../models/Profile");
 const AppError = require("../utils/appError");
 const Blog = require("../models/Blogs");
 const mongoose = require("mongoose");
+const { uploadFileToCloudinary } = require("../utils/fileUploader");
 
 exports.updateProfile = async (req, res) => {
   try {
@@ -13,7 +14,7 @@ exports.updateProfile = async (req, res) => {
         message: "Unauthorized. Token not found or invalid",
       });
     }
-    const {
+    let {
       age,
       dob,
       bio,
@@ -24,8 +25,8 @@ exports.updateProfile = async (req, res) => {
       country,
       website,
       interests,
+      socials,
     } = req.body;
-
     //  validations
     if (age && (!Number.isInteger(Number(age)) || age < 1 || age > 120))
       return res.status(400).json({ success: false, message: "Invalid age" });
@@ -81,16 +82,21 @@ exports.updateProfile = async (req, res) => {
       { new: true }
     );
 
+    updatedProfile.socials = socials;
+    await updatedProfile.save();
     if (!updatedProfile)
       return res.status(404).json({
         success: false,
         message: "Profile not found",
       });
 
+    const updatedUser = await User.findById(userId)
+      .populate("profile")
+      .select("-password");
     return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      profile: updatedProfile,
+      updatedUser,
     });
   } catch (err) {
     console.log("ERROR WHILE UPDATING PROFILE", err);
@@ -210,6 +216,40 @@ exports.userBlogs = async (req, res, next) => {
       success: true,
       message: "All blogs by you fetched successfully",
       blog: blogs,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
+
+// update profile picture
+exports.updatePicture = async (req, res, next) => {
+  try {
+    let { profileImage } = req.files;
+    const userId = req.user.id;
+    if (!mongoose.Types.ObjectId.isValid(userId))
+      return next(new AppError("Invalid user Id"));
+
+    if (!profileImage)
+      return next(new AppError("Profile picture is required", 400));
+
+    console.log("file", profileImage);
+    if (typeof profileImage !== "string") {
+      const updatedPicture = await uploadFileToCloudinary(profileImage, 50);
+      profileImage = updatedPicture.url;
+    }
+
+    const user = await User.findById(userId)
+      .populate("profile")
+      .select("-password");
+    if (!user) return next(new AppError("User not found", 404));
+
+    user.image = profileImage;
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "Picture updated successfully",
+      user,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));
