@@ -22,7 +22,8 @@ exports.auth = async (req, res, next) => {
         message: "Invalid token or modified token .Please login again",
       });
     // decode object me user detail or expiry hoti hai
-    //     console.log("DECODE:", decode);
+    console.log("TOKEN:", token);
+    console.log("DECODE:", decode);
     req.user = decode;
     next();
   } catch (err) {
@@ -47,11 +48,11 @@ exports.isAdmin = async (req, res, next) => {
     //   });
 
     const userId = req.user.id;
-       if (!userId)
-         return res.status(400).json({
-           success: false,
-           message: "Toke not found",
-         });
+    if (!userId)
+      return res.status(400).json({
+        success: false,
+        message: "Toke not found",
+      });
     // console.log("req.user", req.user);
     const user = await User.findById(userId);
 

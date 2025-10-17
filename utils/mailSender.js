@@ -24,5 +24,5 @@ exports.mailSender = async (email, title, body) => {
  * Mail Sender Utility
  * --------------------
  * Mai switch kr rha hu smtp.gmail.com --> resend apis
- * Reason: Render/Vercel SMTP + Resend uses HTTPS (443) → works everywhere
+ * Reason: Render/Vercel SMTP Block port 443 , + Resend uses HTTPS (443) → works everywhere
  */
