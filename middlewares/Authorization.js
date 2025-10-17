@@ -4,10 +4,13 @@ const User = require("../models/User");
 // authorization
 exports.auth = async (req, res, next) => {
   try {
+    // console.log("Req.headers", req);
     const token =
       req.cookies?.token ||
       req.body?.token ||
-      req.headers.authorization?.split(" ")[1];
+      req.headers.authorization?.split(" ").pop();
+
+    // const token = req.headers.authorization?.split(" ")[1];
     // cookies,body,authorization
     if (!token)
       return res.status(404).json({
@@ -22,8 +25,8 @@ exports.auth = async (req, res, next) => {
         message: "Invalid token or modified token .Please login again",
       });
     // decode object me user detail or expiry hoti hai
-    console.log("TOKEN:", token);
-    console.log("DECODE:", decode);
+    // console.log("TOKEN:", token);
+    // console.log("DECODE:", decode);
     req.user = decode;
     next();
   } catch (err) {
@@ -46,7 +49,7 @@ exports.isAdmin = async (req, res, next) => {
     //     success: false,
     //     message: "Unauthorized. Token not found or invalid",
     //   });
-
+    console.log("REQ.USER", req.user);
     const userId = req.user.id;
     if (!userId)
       return res.status(400).json({
