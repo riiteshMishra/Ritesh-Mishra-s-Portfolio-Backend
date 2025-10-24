@@ -13,7 +13,7 @@ exports.sendOtp = async (req, res) => {
     const { email } = req.body;
 
     let otp;
-    const otpExists = true;
+    let otpExists = true;
 
     // find unique otp
     while (otpExists) {
@@ -23,7 +23,7 @@ exports.sendOtp = async (req, res) => {
     }
 
     // create entry in db
-    const savedOtp = await OTP.create({
+    await OTP.create({
       email: email,
       otp: otp,
     });

@@ -12,7 +12,7 @@ exports.mailSender = async (email, title, body) => {
       html: body,
     });
 
-    console.log("Email sent successfully via Resend API");
+    // console.log("Email sent successfully via Resend API");
     return response;
   } catch (error) {
     console.error("Failed to send email via Resend API:", error);
