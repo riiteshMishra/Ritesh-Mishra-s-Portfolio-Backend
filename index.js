@@ -26,7 +26,7 @@ app.use(cookieParser());
 // Allowed origin
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://ritesh-mishra-s-portfolio-frondtend.vercel.app",
+  "riteshmishra.online",
 ];
 app.use(
   cors({
