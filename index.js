@@ -26,7 +26,8 @@ app.use(cookieParser());
 // Allowed origin
 const allowedOrigins = [
   "http://localhost:5173",
-  "riteshmishra.online",
+  "https://riteshmishra.online",
+  "https://www.riteshmishra.online",
 ];
 app.use(
   cors({
