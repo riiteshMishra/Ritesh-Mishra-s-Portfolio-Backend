@@ -11,23 +11,29 @@ const { signUpOtpTemplate } = require("../emailTemplates/signupTemplate");
 exports.sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
-    const otp = 23423;
 
-    const otpData = await OTP.create({
+    let otp;
+    const otpExists = true;
+
+    // find unique otp
+    while (otpExists) {
+      otp = crypto.randomInt(100000, 999999);
+      const otpInDB = await OTP.findOne({ otp });
+      if (!otpInDB) otpExists = false;
+    }
+
+    // create entry in db
+    const savedOtp = await OTP.create({
       email: email,
       otp: otp,
     });
 
-    const mailInfo = await mailSender(
-      email,
-      "Sign up otp",
-      signUpOtpTemplate(email, otpData.otp)
-    );
-    console.log("mail info", mailInfo);
+    // mail se send kr do
+    await mailSender(email, "for verification", signUpOtpTemplate(email, otp));
+
     return res.status(200).json({
       success: true,
       message: "otp send to the email",
-      otp: otpData.otp,
     });
   } catch (err) {
     console.log("ERROR WHILE SENDING EMAIL", err);
