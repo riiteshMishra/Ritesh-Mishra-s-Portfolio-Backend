@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { mailSender } = require("../utils/mailSender");
 const { forgotPasswordTemplate } = require("../emailTemplates/forgot_password");
+const { signUpOtpTemplate } = require("../emailTemplates/signupTemplate");
 // send otp
 exports.sendOtp = async (req, res) => {
   try {
@@ -16,7 +17,14 @@ exports.sendOtp = async (req, res) => {
       email: email,
       otp: otp,
     });
-    res.status(200).json({
+
+    const mailInfo = await mailSender(
+      email,
+      "Sign up otp",
+      signUpOtpTemplate(email, otpData.otp)
+    );
+    console.log("mail info", mailInfo);
+    return res.status(200).json({
       success: true,
       message: "otp send to the email",
       otp: otpData.otp,

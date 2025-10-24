@@ -13,7 +13,7 @@ exports.auth = async (req, res, next) => {
     // const token = req.headers.authorization?.split(" ")[1];
     // cookies,body,authorization
     if (!token)
-      return res.status(404).json({
+      return res.status(401).json({
         success: false,
         message: "JWT token is missing",
       });
@@ -24,6 +24,13 @@ exports.auth = async (req, res, next) => {
         success: false,
         message: "Invalid token or modified token .Please login again",
       });
+
+    if (!decode)
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token or token has been modified. Please login again",
+      });
+      
     // decode object me user detail or expiry hoti hai
     // console.log("TOKEN:", token);
     // console.log("DECODE:", decode);
