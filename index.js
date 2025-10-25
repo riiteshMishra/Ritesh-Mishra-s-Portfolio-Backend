@@ -12,9 +12,16 @@ const errorHandler = require("./middlewares/ErrorHandler");
 const categoryRoutes = require("./routes/Category");
 const projectsRoutes = require("./routes/projects");
 const blogRoutes = require("./routes/blog");
+const rateLimit = require("express-rate-limit");
 
 // 2) App Config
 const PORT = process.env.PORT || 4000;
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 50,
+  message: "Too many request , please try again letter.",
+});
+app.use(limiter);
 
 // 3) Database Connection
 connectDb();
@@ -29,6 +36,7 @@ const allowedOrigins = [
   "https://riteshmishra.online",
   "https://www.riteshmishra.online",
 ];
+
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -59,6 +67,7 @@ app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/projects", projectsRoutes);
 app.use("/api/v1/blogs", blogRoutes);
 
+// global config
 app.use(errorHandler);
 
 // 6) Start Server
