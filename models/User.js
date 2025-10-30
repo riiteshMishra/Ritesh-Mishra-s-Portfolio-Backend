@@ -47,6 +47,10 @@ const userSchema = new mongoose.Schema(
         ref: "Blog",
       },
     ],
+    reviews: {
+      type: mongoose.Types.ObjectId,
+      ref: "CustomerReview",
+    },
   },
   { timestamps: true }
 );

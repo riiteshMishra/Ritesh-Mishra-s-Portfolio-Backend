@@ -13,6 +13,7 @@ const categoryRoutes = require("./routes/Category");
 const projectsRoutes = require("./routes/projects");
 const blogRoutes = require("./routes/blog");
 const rateLimit = require("express-rate-limit");
+const reviewRoute = require("./routes/Reviews");
 
 // 2) App Config
 const PORT = process.env.PORT || 4000;
@@ -66,7 +67,7 @@ app.use("/api/v1/profile", profileRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/projects", projectsRoutes);
 app.use("/api/v1/blogs", blogRoutes);
-
+app.use("/api/v1/reviews", reviewRoute);
 // global config
 app.use(errorHandler);
 
