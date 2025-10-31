@@ -56,7 +56,7 @@ exports.isAdmin = async (req, res, next) => {
     //     success: false,
     //     message: "Unauthorized. Token not found or invalid",
     //   });
-    console.log("REQ.USER", req.user);
+    // console.log("REQ.USER", req.user);
     const userId = req.user.id;
     if (!userId)
       return res.status(400).json({
@@ -87,24 +87,17 @@ exports.isAdmin = async (req, res, next) => {
 // isClient
 exports.isClient = async (req, res, next) => {
   try {
-    // some one is escaping authorization
-    // if (!req.user)
-    //   return res.status(401).json({
-    //     success: false,
-    //     message: "Unauthorized. Token not found or invalid",
-    //   });
-
     const userId = req.user.id;
     if (!userId)
       return res.status(400).json({
         success: false,
-        message: "Toke not found",
+        message: "Token not found",
       });
     // console.log("req.user", req.user);
     const user = await User.findById(userId);
 
     //     account type match
-    if (user.accountType !== "Client")
+    if (user?.accountType !== "Client")
       return res.status(400).json({
         success: false,
         message: "This route is protected for Clients only",

@@ -1,6 +1,7 @@
 console.log(":: Shree Ganeshay namah ::");
 const express = require("express");
 const app = express();
+app.set("trust proxy", 1); 
 const cors = require("cors");
 require("dotenv").config();
 const fileUpload = require("express-fileupload");
