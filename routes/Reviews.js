@@ -8,6 +8,7 @@ const {
   deleteReview,
   getAllReviews,
   nonApproved,
+  getClientReview,
 } = require("../controllers/Review");
 
 router.post("/create-review", auth, isClient, CreateReview);
@@ -16,5 +17,6 @@ router.post("/update-review", auth, isClient, updateReview);
 router.post("/delete-review", auth, isAdmin, deleteReview);
 router.get("/get-all-reviews", getAllReviews);
 router.post("/get-non-approved-reviews", auth, isAdmin, nonApproved);
+router.get("/get-client-review", auth, isClient, getClientReview);
 
 module.exports = router;

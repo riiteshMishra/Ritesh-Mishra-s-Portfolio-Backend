@@ -24,7 +24,7 @@ exports.uploadFileToCloudinary = async (file, quality) => {
       public_id: response.public_id,
     };
   } catch (err) {
-    console.error("Upload error:", err);
+    console.error("Image Upload error:", err);
 
     return {
       success: false,

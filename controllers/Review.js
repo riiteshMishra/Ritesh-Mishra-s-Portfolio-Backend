@@ -34,7 +34,6 @@ exports.CreateReview = async (req, res, next) => {
 
     // user se uska detail nikalo
     const { firstName, lastName, email, image } = user;
-
     // check if the user has already given a review to this developer
     const existingReview = await CustomerReview.findOne({ email });
 
@@ -56,6 +55,10 @@ exports.CreateReview = async (req, res, next) => {
       projectName,
     });
 
+    console.log("review", review._id);
+    user.reviews = review?._id;
+    await user.save();
+    console.log("review ,", review);
     // return response
     return res.status(200).json({
       success: true,
@@ -238,6 +241,33 @@ exports.nonApproved = async (req, res, next) => {
           ? "All non approved reviews fetched successfully"
           : "No non-approved reviews found",
       data: nonApprovedReviews,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
+
+// get review by clint
+exports.getClientReview = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    // validation
+    if (!mongoose.Types.ObjectId.isValid(userId))
+      return next(new AppError("Invalid user Id", 400));
+
+    // find user
+    const user = await User.findById(userId);
+    if (!user) return next(new AppError("User not found", 404));
+
+    // find review by this user
+    const review = await CustomerReview.findOne({ email: user?.email });
+
+    // return dynamic response
+    return res.status(200).json({
+      success: true,
+      message: review ? "Review fetched successfully" : "Review not found",
+      data: review ? review : null,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));

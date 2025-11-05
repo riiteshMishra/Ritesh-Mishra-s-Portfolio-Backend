@@ -187,7 +187,9 @@ exports.login = async (req, res) => {
       });
 
     // user ko find
-    const user = await User.findOne({ email }).populate("profile");
+    const user = await User.findOne({ email })
+      .populate("profile")
+      .populate("reviews");
     if (!user)
       return res.status(404).json({
         success: false,
