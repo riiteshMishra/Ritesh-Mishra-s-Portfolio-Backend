@@ -1,7 +1,7 @@
 console.log(":: Shree Ganeshay namah ::");
 const express = require("express");
 const app = express();
-app.set("trust proxy", 1); 
+app.set("trust proxy", 1);
 const cors = require("cors");
 require("dotenv").config();
 const fileUpload = require("express-fileupload");
@@ -15,6 +15,7 @@ const projectsRoutes = require("./routes/projects");
 const blogRoutes = require("./routes/blog");
 const rateLimit = require("express-rate-limit");
 const reviewRoute = require("./routes/Reviews");
+const fileuploadRoute = require("./routes/uploadFile");
 
 // 2) App Config
 const PORT = process.env.PORT || 4000;
@@ -69,6 +70,7 @@ app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/projects", projectsRoutes);
 app.use("/api/v1/blogs", blogRoutes);
 app.use("/api/v1/reviews", reviewRoute);
+app.use("/api/v1/upload/", fileuploadRoute);
 // global config
 app.use(errorHandler);
 
