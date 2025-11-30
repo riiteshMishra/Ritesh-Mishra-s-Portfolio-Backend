@@ -1,5 +1,5 @@
 require("dotenv").config()
-exports.forgotPasswordTemplate = (email, token) => {
+exports.forgotPasswordTemplate = (email, url) => {
   return `
   <!DOCTYPE html>
   <html>
@@ -21,7 +21,7 @@ exports.forgotPasswordTemplate = (email, token) => {
                     We received a request to reset your password. Click the button below to reset it. 
                     This link will expire in <b>10 minutes</b>.
                   </p>
-                  <a href="${process.env.FRONTEND_URL}/reset-password/${token}"
+                  <a href="${url}"
                     style="display: inline-block; margin: 20px 0; padding: 12px 20px; background-color: #4f46e5; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
                     Reset Password
                   </a>

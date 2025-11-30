@@ -351,7 +351,7 @@ exports.generateResetPasswordToken = async (req, res) => {
     await user.save();
 
     // create reset link
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.DOMAIN}/reset-password/${resetToken}`;
 
     // send reset password token to user via email
     await mailSender(
@@ -362,7 +362,7 @@ exports.generateResetPasswordToken = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Reset password token sent to your email",
-      url: resetUrl,
+      // url: resetUrl,
     });
   } catch (err) {
     console.log("ERROR WHILE RESETTING PASSWORD", err);
