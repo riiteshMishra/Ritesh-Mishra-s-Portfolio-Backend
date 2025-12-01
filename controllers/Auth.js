@@ -251,7 +251,7 @@ exports.login = async (req, res) => {
   }
 };
 
-//change-password
+//change-password for logged in user
 exports.changePassword = async (req, res) => {
   try {
     // some one is escaping authorization
@@ -375,25 +375,27 @@ exports.generateResetPasswordToken = async (req, res) => {
   }
 };
 
+// for logged out user
 exports.resetPassword = async (req, res) => {
   try {
     // token validation
-    let { token } = req.params;
-    token = token.trim();
-    const { password } = req.body;
+    let { resetToken } = req.params;
+    token = resetToken.trim();
+    const { password, confirmPassword } = req.body;
+
+    // reset-token
     if (!token)
       return res.status(404).json({
         success: false,
         message: "Token not found",
       });
-    if (!password)
+    if (!password || !confirmPassword)
       return res.status(400).json({
         success: false,
         message: "New password is required",
       });
 
-    //hashed token
-    // hashed token
+    // jo reset-token aaya hai usko hash kro
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     // user side
