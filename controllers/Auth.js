@@ -380,7 +380,9 @@ exports.resetPassword = async (req, res) => {
   try {
     // token validation
     let { resetToken } = req.params;
-    token = resetToken.trim();
+
+    const token = resetToken?.trim();
+
     const { password, confirmPassword } = req.body;
 
     // reset-token
@@ -389,17 +391,24 @@ exports.resetPassword = async (req, res) => {
         success: false,
         message: "Token not found",
       });
+
     if (!password || !confirmPassword)
       return res.status(400).json({
         success: false,
         message: "New password is required",
       });
 
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Password & Confirm Password do not match",
+      });
+    }
+
     // jo reset-token aaya hai usko hash kro
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     // user side
-
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
       resetPasswordExpire: { $gt: Date.now() },
@@ -408,18 +417,18 @@ exports.resetPassword = async (req, res) => {
     if (!user)
       return res.status(404).json({
         success: false,
-        message: "User not fund or token not matched",
+        message: "User not found or token not matched",
       });
 
     // agar user mil gya to
     const HashedPassword = await bcrypt.hash(password, 10);
     user.password = HashedPassword;
-    await user.save();
 
-    // clear reset fields
+    // pehle fields clear karo, phir save karo
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
+    await user.save();
     // success response
     return res.status(200).json({
       success: true,
