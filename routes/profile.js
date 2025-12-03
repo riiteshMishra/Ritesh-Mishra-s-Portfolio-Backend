@@ -37,8 +37,11 @@ router.post("/upload-file", auth, isAdmin, async (req, res, next) => {
     }
 
     // Upload file to Cloudinary
-    const uploadedFile = await uploadFileToCloudinary(file, 50);
+    const uploadedFile = await uploadFileToCloudinary(file);
+    console.log("uploaded file", uploadedFile);
 
+    if (!uploadedFile.success)
+      return next(new AppError("file upload failed ", 400));
     // Send response
     return res.status(200).json({
       success: true,
