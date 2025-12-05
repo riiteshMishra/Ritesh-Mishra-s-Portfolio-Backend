@@ -27,12 +27,11 @@ exports.createProject = async (req, res, next) => {
       return next(new AppError("Thumbnail is required", 400));
     }
     let { thumbnail } = req.files;
-    thumbnail = (await uploadFileToCloudinary(thumbnail)).url;
-
+    
     //  user validation
     const user = await User.findById(userId);
     if (!user) return next(new AppError("User not found", 404));
-
+    
     //  required fields
     if (
       !projectName ||
@@ -43,7 +42,8 @@ exports.createProject = async (req, res, next) => {
     ) {
       return next(new AppError("All fields are required", 400));
     }
-
+    
+    thumbnail = (await uploadFileToCloudinary(thumbnail)).url;
     //  sanitization
     projectName = projectName.toString().toLowerCase().trim();
     description = description.toString().trim();
