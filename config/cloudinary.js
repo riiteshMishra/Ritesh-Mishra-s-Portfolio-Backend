@@ -7,7 +7,5 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-console.log("CLOUDINARY CONFIGURED SUCCESSFULLY");
-
 
 module.exports = cloudinary;

@@ -22,16 +22,24 @@ exports.createProject = async (req, res, next) => {
       backendTech,
     } = req.body;
 
+    console.log(
+      projectName,
+      description,
+      gitHubLink,
+      liveLink,
+      frontendTech,
+      backendTech
+    );
     // thumbnail required check
     if (!req.files || !req.files.thumbnail) {
       return next(new AppError("Thumbnail is required", 400));
     }
     let { thumbnail } = req.files;
-    
+
     //  user validation
     const user = await User.findById(userId);
     if (!user) return next(new AppError("User not found", 404));
-    
+
     //  required fields
     if (
       !projectName ||
@@ -42,30 +50,15 @@ exports.createProject = async (req, res, next) => {
     ) {
       return next(new AppError("All fields are required", 400));
     }
-    
+
     thumbnail = (await uploadFileToCloudinary(thumbnail)).url;
+    if (!thumbnail) return next(new AppError("thumbnail upload failed", 499));
     //  sanitization
     projectName = projectName.toString().toLowerCase().trim();
     description = description.toString().trim();
     gitHubLink = gitHubLink.toString().trim();
     thumbnail = thumbnail.toString().trim();
     liveLink = liveLink ? liveLink.toString().trim() : null;
-
-    if (Array.isArray(frontendTech)) {
-      frontendTech = frontendTech.map((t) => t.toString().toLowerCase().trim());
-    } else if (typeof frontendTech === "string") {
-      frontendTech = [frontendTech.toLowerCase().trim()];
-    } else {
-      frontendTech = [];
-    }
-
-    if (Array.isArray(backendTech)) {
-      backendTech = backendTech.map((t) => t.toString().toLowerCase().trim());
-    } else if (typeof backendTech === "string") {
-      backendTech = [backendTech.toLowerCase().trim()];
-    } else {
-      backendTech = [];
-    }
 
     const project = await Projects.create({
       projectName,
@@ -81,7 +74,7 @@ exports.createProject = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       message: "Project created successfully",
-      project,
+      data: project,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));
@@ -206,7 +199,7 @@ exports.getAllProjects = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "All Projects fetched successfully",
-      allProjects,
+      data: allProjects,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));

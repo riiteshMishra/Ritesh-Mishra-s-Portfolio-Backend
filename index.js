@@ -38,6 +38,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://riteshmishra.online",
   "https://www.riteshmishra.online",
+  "https://ritesh-mishra-s-portfolio-f-riteshmishra9565-gmailcoms-projects.vercel.app/",
+  "https://ritesh-mishra-s-portfolio-frondtend.vercel.app/",
 ];
 
 app.use(
