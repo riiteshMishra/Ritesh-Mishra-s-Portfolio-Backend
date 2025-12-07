@@ -22,14 +22,6 @@ exports.createProject = async (req, res, next) => {
       backendTech,
     } = req.body;
 
-    console.log(
-      projectName,
-      description,
-      gitHubLink,
-      liveLink,
-      frontendTech,
-      backendTech
-    );
     // thumbnail required check
     if (!req.files || !req.files.thumbnail) {
       return next(new AppError("Thumbnail is required", 400));
@@ -41,13 +33,7 @@ exports.createProject = async (req, res, next) => {
     if (!user) return next(new AppError("User not found", 404));
 
     //  required fields
-    if (
-      !projectName ||
-      !description ||
-      !gitHubLink ||
-      !thumbnail ||
-      !frontendTech
-    ) {
+    if (!projectName || !description || !gitHubLink || !thumbnail) {
       return next(new AppError("All fields are required", 400));
     }
 
@@ -59,6 +45,11 @@ exports.createProject = async (req, res, next) => {
     gitHubLink = gitHubLink.toString().trim();
     thumbnail = thumbnail.toString().trim();
     liveLink = liveLink ? liveLink.toString().trim() : null;
+
+    // Convert to array agar single value comes
+    if (frontendTech && !Array.isArray(frontendTech))
+      frontendTech = [frontendTech];
+    if (backendTech && !Array.isArray(backendTech)) backendTech = [backendTech];
 
     const project = await Projects.create({
       projectName,
@@ -189,19 +180,19 @@ exports.updateProject = async (req, res, next) => {
 // get all projects
 exports.getAllProjects = async (req, res, next) => {
   try {
-    // all projects
     const allProjects = await Projects.find();
 
-    // if 0 projects
-    if (allProjects.length === 0)
-      return next(new AppError("Currently we don't have any projects."));
+    const message =
+      allProjects.length === 0
+        ? "You have not created any project yet"
+        : "All projects fetched successfully";
 
     return res.status(200).json({
       success: true,
-      message: "All Projects fetched successfully",
+      message,
       data: allProjects,
     });
   } catch (err) {
-    return next(new AppError(err.message, 500));
+    next(new AppError(err.message, 500));
   }
 };
