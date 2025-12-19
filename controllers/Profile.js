@@ -239,7 +239,7 @@ exports.updatePicture = async (req, res, next) => {
       const updatedPicture = await uploadFileToCloudinary(
         profileImage,
         50,
-        cloud_sub_folder.USER_PROFILE
+        cloud_sub_folder.USER_PROFILE_IMAGE
       );
 
       if (!updatedPicture.success)
@@ -249,7 +249,7 @@ exports.updatePicture = async (req, res, next) => {
     }
 
     if (!profileImage) next(new AppError("Profile image updating failed", 400));
-    
+
     const user = await User.findById(userId)
       .populate("profile")
       .select("-password");
