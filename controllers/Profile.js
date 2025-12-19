@@ -238,8 +238,8 @@ exports.updatePicture = async (req, res, next) => {
     if (profileImage?.tempFilePath) {
       const updatedPicture = await uploadFileToCloudinary(
         profileImage,
-        50,
-        cloud_sub_folder.USER_PROFILE_IMAGE
+        cloud_sub_folder.USER_PROFILE_IMAGE,
+        50
       );
 
       if (!updatedPicture.success)

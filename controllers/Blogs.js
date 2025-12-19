@@ -4,6 +4,7 @@ const Category = require("../models/Category");
 const User = require("../models/User");
 const AppError = require("../utils/appError");
 const { uploadFileToCloudinary } = require("../utils/fileUploader");
+const { cloud_sub_folder } = require("../utils/varHelper");
 
 // create blogs
 exports.createBlog = async (req, res, next) => {
@@ -20,8 +21,14 @@ exports.createBlog = async (req, res, next) => {
     // Thumbnail
     let { thumbnail } = req.files;
     if (!thumbnail) return next(new AppError("Thumbnail is required", 400));
-    thumbnail = await uploadFileToCloudinary(thumbnail);
+    thumbnail = await uploadFileToCloudinary(
+      thumbnail,
+      cloud_sub_folder.BLOG_THUMBNAIL_IMAGE
+    );
 
+    if (!thumbnail?.success)
+      return next(new AppError("Thumbnail upload failed", 400));
+    
     // input data sanitize
     title = title.toString().toLowerCase().trim();
     slug = slug.toString().toLowerCase().trim();
@@ -394,4 +401,3 @@ exports.getLikedBlogs = async (req, res, next) => {
     return next(new AppError(err.message, 500));
   }
 };
-
