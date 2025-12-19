@@ -7,6 +7,7 @@ const blogSchema = new mongoose.Schema(
       required: true,
       trim: true,
       maxLength: 150,
+      unique: true,
     },
 
     slug: {
@@ -69,7 +70,12 @@ const blogSchema = new mongoose.Schema(
         },
       },
     ],
-
+    sections: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Section",
+      },
+    ],
     isPublished: {
       type: Boolean,
       default: false,

@@ -4,6 +4,7 @@ const AppError = require("../utils/appError");
 const Blog = require("../models/Blogs");
 const mongoose = require("mongoose");
 const { uploadFileToCloudinary } = require("../utils/fileUploader");
+const { cloud_sub_folder } = require("../utils/varHelper");
 
 exports.updateProfile = async (req, res) => {
   try {
@@ -233,12 +234,22 @@ exports.updatePicture = async (req, res, next) => {
     if (!profileImage)
       return next(new AppError("Profile picture is required", 400));
 
-    console.log("file", profileImage);
-    if (typeof profileImage !== "string") {
-      const updatedPicture = await uploadFileToCloudinary(profileImage, 50);
+    // console.log("file", profileImage);
+    if (profileImage?.tempFilePath) {
+      const updatedPicture = await uploadFileToCloudinary(
+        profileImage,
+        50,
+        cloud_sub_folder.USER_PROFILE
+      );
+
+      if (!updatedPicture.success)
+        return next(new AppError("Image upload failed", 500));
+
       profileImage = updatedPicture.url;
     }
 
+    if (!profileImage) next(new AppError("Profile image updating failed", 400));
+    
     const user = await User.findById(userId)
       .populate("profile")
       .select("-password");
