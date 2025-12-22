@@ -124,13 +124,13 @@ exports.allCategories = async (req, res, next) => {
   try {
     const allCategories = await Category.find().populate("blogs");
 
-    if (allCategories.length === 0)
-      return next(new AppError("we have no category", 404, req.originalUrl));
-
     return res.status(200).json({
       success: true,
-      message: "All Categories founded",
-      allCategories,
+      message:
+        allCategories.length < 1
+          ? "We have no category"
+          : "All categories fetched successfully",
+      data: allCategories,
     });
   } catch (err) {
     return next(new AppError(err.message, 500, req.originalUrl));

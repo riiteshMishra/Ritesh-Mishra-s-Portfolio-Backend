@@ -28,7 +28,7 @@ exports.createBlog = async (req, res, next) => {
 
     if (!thumbnail?.success)
       return next(new AppError("Thumbnail upload failed", 400));
-    
+
     // input data sanitize
     title = title.toString().toLowerCase().trim();
     slug = slug.toString().toLowerCase().trim();
@@ -168,18 +168,19 @@ exports.findAllBlogs = async (req, res, next) => {
       "name email"
     );
 
-    if (allBlogs.length === 0)
-      return next(new AppError("Currently we don't have any blog", 404));
-
     return res.status(200).json({
       success: true,
-      message: "All blogs fetched successfully",
+      message:
+        allBlogs.length === 0
+          ? "No blogs available at the moment"
+          : "All blogs fetched successfully",
       allBlogs,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));
   }
 };
+
 
 exports.toggleBlogLike = async (req, res, next) => {
   try {
