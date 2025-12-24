@@ -38,7 +38,6 @@ exports.createCategory = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "category created successfully",
-      data: category,
     });
   } catch (err) {
     return next(new AppError(err.message, 500, req.originalUrl));
@@ -97,7 +96,7 @@ exports.deleteCategory = async (req, res, next) => {
     //Validation
     if (!categoryId) return next(new AppError("Category id is required"));
 
-    if (categoryId.length !== 24)
+    if (!mongoose.Types.ObjectId.isValid(categoryId))
       return next(new AppError("Category Id invalid", 400));
 
     // sanitize
@@ -110,9 +109,13 @@ exports.deleteCategory = async (req, res, next) => {
 
     // agar category mil gya to delete kr do
     await Category.findByIdAndDelete(categoryId);
+
+    const allCategories = await Category.find().populate("blogs");
+    
     return res.status(200).json({
       success: true,
       message: "category deleted successfully",
+      data:allCategories
     });
   } catch (err) {
     return next(new AppError(err.message, 500, req.originalUrl));
