@@ -69,20 +69,15 @@ exports.getAllRequests = async (req, res, next) => {
     // const limit = parseInt(req.query.limit) || 20;
     // const skip = (page - 1) * limit;
 
-    const requests = await ContactModel.find(); // .skip(skip).limit(limit)
-
-    if (requests.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Currently you don't have any client requests",
-        requests: [],
-      });
-    }
+    const requests = await ContactModel.find({}); // .skip(skip).limit(limit)
 
     return res.status(200).json({
       success: true,
-      message: "All requests fetched successfully",
-      requests,
+      message:
+        requests.length === 0
+          ? "Currently you don't have any client requests"
+          : "All requests fetched successfully",
+      data: requests,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));

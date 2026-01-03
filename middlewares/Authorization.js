@@ -30,7 +30,7 @@ exports.auth = async (req, res, next) => {
         success: false,
         message: "Invalid token or token has been modified. Please login again",
       });
-      
+
     // decode object me user detail or expiry hoti hai
     // console.log("TOKEN:", token);
     // console.log("DECODE:", decode);
@@ -40,8 +40,7 @@ exports.auth = async (req, res, next) => {
     console.log("ERROR WHILE AUTHORIZATION", err);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
-      error: err.message,
+      message: err.message ? err.message : "Internal server error",
       path: "./middlewares/authorization/auth",
     });
   }
