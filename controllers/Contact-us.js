@@ -143,3 +143,44 @@ exports.updateStatus = async (req, res, next) => {
     return next(new AppError(err.message, 500));
   }
 };
+
+// DELETE REQUESTS BY ID
+exports.deleteRequests = async (req, res, next) => {
+  try {
+    const { requestIds } = req.body;
+    
+    if (!requestIds) {
+      return next(new AppError("Id required", 400));
+    }
+
+    // Normalize ids
+    let freshIds = [];
+
+    if (typeof requestIds === "string") {
+      if (!mongoose.Types.ObjectId.isValid(requestIds)) {
+        return next(new AppError("Invalid Id", 400));
+      }
+      freshIds = [requestIds];
+    } else if (Array.isArray(requestIds)) {
+      freshIds = requestIds.filter((id) => mongoose.Types.ObjectId.isValid(id));
+    }
+
+    if (freshIds.length === 0) {
+      return next(new AppError("No valid ids found", 400));
+    }
+
+    // MongoDB optimized delete
+    const deleted = await ContactModel.deleteMany({
+      _id: { $in: freshIds },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Request(s) deleted successfully",
+      data: deleted,
+    });
+  } catch (err) {
+    return next(new AppError(err.message || err, 500));
+  }
+};
+

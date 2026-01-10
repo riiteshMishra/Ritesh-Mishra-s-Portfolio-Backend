@@ -13,6 +13,7 @@ const {
   contactUs,
   getAllRequests,
   updateStatus,
+  deleteRequests,
 } = require("../controllers/Contact-us");
 const { uploadFileToCloudinary } = require("../utils/fileUploader");
 const router = express.Router();
@@ -27,6 +28,7 @@ router.post("/update-profile-picture", auth, updatePicture);
 router.post("/create-request", contactUs);
 router.get("/client-requests", auth, isAdmin, getAllRequests);
 router.post("/form-status-update", auth, isAdmin, updateStatus);
+router.post("/delete-requests", auth, isAdmin, deleteRequests);
 
 // local file upload and get cloud link
 router.post("/upload-file", auth, isAdmin, async (req, res, next) => {
