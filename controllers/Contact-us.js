@@ -87,9 +87,9 @@ exports.getAllRequests = async (req, res, next) => {
 // update status
 exports.updateStatus = async (req, res, next) => {
   try {
-    const { formId, status } = req.body;
+    const { requestId, status } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(formId))
+    if (!mongoose.Types.ObjectId.isValid(requestId))
       return next(new AppError("Invalid form Id", 400));
 
     const allowedStatuses = ["pending", "resolved", "rejected"];
@@ -101,7 +101,7 @@ exports.updateStatus = async (req, res, next) => {
         )
       );
 
-    const request = await ContactModel.findById(formId);
+    const request = await ContactModel.findById(requestId);
     if (!request) return next(new AppError("Request not found", 404));
 
     request.status = status;
@@ -122,11 +122,6 @@ exports.updateStatus = async (req, res, next) => {
 
     // Clone request for safe response
     const responseData = { ...request.toObject() };
-
-    // delete after resolved
-    if (status === "resolved") {
-      await ContactModel.findByIdAndDelete(formId);
-    }
 
     const statusMessageMap = {
       pending: "Request marked as pending",
