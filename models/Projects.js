@@ -14,7 +14,7 @@ const projectSchema = new mongoose.Schema(
       type: String,
       trim: true,
       required: true,
-      maxLength: 400,
+      maxLength: 1500,
     },
 
     gitHubLink: {
