@@ -38,29 +38,28 @@ exports.createProject = async (req, res, next) => {
     }
 
     thumbnail = (await uploadFileToCloudinary(thumbnail)).url;
-    // if (!thumbnail) return next(new AppError("thumbnail upload failed", 499));
+    if (!thumbnail) return next(new AppError("thumbnail upload failed", 499));
     //  sanitization
     projectName = projectName.toString().toLowerCase().trim();
     description = description.toString().trim();
     gitHubLink = gitHubLink.toString().trim();
     liveLink = liveLink ? liveLink.toString().trim() : null;
 
-
-    // const project = await Projects.create({
-    //   projectName,
-    //   description,
-    //   gitHubLink,
-    //   liveLink,
-    //   frontendTech,
-    //   backendTech,
-    //   thumbnail,
-    //   createdBy: user._id,
-    // });
+    const project = await Projects.create({
+      projectName,
+      description,
+      gitHubLink,
+      liveLink,
+      frontendTech,
+      backendTech,
+      thumbnail,
+      createdBy: user._id,
+    });
 
     return res.status(201).json({
       success: true,
       message: "Project created successfully",
-      // data: project,
+      data: project,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));

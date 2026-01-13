@@ -88,7 +88,6 @@ exports.getAllRequests = async (req, res, next) => {
 exports.updateStatus = async (req, res, next) => {
   try {
     const { requestId, status } = req.body;
-
     if (!mongoose.Types.ObjectId.isValid(requestId))
       return next(new AppError("Invalid form Id", 400));
 
@@ -129,10 +128,10 @@ exports.updateStatus = async (req, res, next) => {
       rejected: "Request has been rejected",
     };
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: statusMessageMap[status],
-      request: responseData,
+      data: responseData,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));
@@ -143,7 +142,7 @@ exports.updateStatus = async (req, res, next) => {
 exports.deleteRequests = async (req, res, next) => {
   try {
     const { requestIds } = req.body;
-    
+
     if (!requestIds) {
       return next(new AppError("Id required", 400));
     }
@@ -178,4 +177,3 @@ exports.deleteRequests = async (req, res, next) => {
     return next(new AppError(err.message || err, 500));
   }
 };
-
