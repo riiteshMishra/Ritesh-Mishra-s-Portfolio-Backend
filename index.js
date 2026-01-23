@@ -1,4 +1,5 @@
 console.log(":: Shree Ganeshay namah ::");
+require("dns").setDefaultResultOrder("ipv4first");
 const express = require("express");
 const app = express();
 app.set("trust proxy", 1);

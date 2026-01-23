@@ -42,7 +42,7 @@ const blogSchema = new mongoose.Schema(
 
     thumbnail: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     likes: [
