@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-
 const sectionSchema = new mongoose.Schema(
   {
     blogId: {
@@ -8,7 +7,7 @@ const sectionSchema = new mongoose.Schema(
       ref: "Blog",
       required: true,
     },
-    title: {
+    sectionName: {
       type: String,
       maxLength: 70,
       trim: true,
@@ -22,14 +21,14 @@ const sectionSchema = new mongoose.Schema(
       lowercase: true,
       required: true,
     },
-    content: [
+    subSection: [
       {
         type: mongoose.Types.ObjectId,
         ref: "SubSection",
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Section = mongoose.model("Section", sectionSchema);

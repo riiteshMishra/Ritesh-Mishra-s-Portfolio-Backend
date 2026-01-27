@@ -70,7 +70,7 @@ const blogSchema = new mongoose.Schema(
         },
       },
     ],
-    sections: [
+    contents: [
       {
         type: mongoose.Types.ObjectId,
         ref: "Section",

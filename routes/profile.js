@@ -16,6 +16,7 @@ const {
   deleteRequests,
 } = require("../controllers/Contact-us");
 const { uploadFileToCloudinary } = require("../utils/fileUploader");
+const { createSection, updateSection, deleteSection } = require("../controllers/BlogSection");
 const router = express.Router();
 
 router.post("/update-profile", auth, updateProfile);
@@ -29,6 +30,11 @@ router.post("/create-request", contactUs);
 router.get("/client-requests", auth, isAdmin, getAllRequests);
 router.post("/form-status-update", auth, isAdmin, updateStatus);
 router.post("/delete-requests", auth, isAdmin, deleteRequests);
+
+// SECTION
+router.post("/create-section", auth, isAdmin, createSection);
+router.post("/update-section", auth, isAdmin, updateSection);
+router.delete("/delete-section/:sectionId", auth, isAdmin, deleteSection);
 
 // local file upload and get cloud link
 router.post("/upload-file", auth, isAdmin, async (req, res, next) => {
