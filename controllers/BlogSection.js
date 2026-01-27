@@ -134,3 +134,58 @@ exports.deleteSection = async (req, res, next) => {
     return next(new AppError(err.message, 500));
   }
 };
+
+// GET ALL SECTIONS OF A BLOG - FUNCTION && LOGIC
+exports.getAllSectionsByBlog = async (req, res, next) => {
+  try {
+    const { blogId } = req.params;
+    const user = await validateUser(req);
+
+    // VALID BLOG ID
+    if (!mongoose.Types.ObjectId.isValid(blogId)) {
+      return next(new AppError("Invalid Blog ID", 400));
+    }
+
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      return next(new AppError("Blog Not Found", 404));
+    }
+
+    const sections = await Section.find({ blogId });
+
+    return res.status(200).json({
+      success: true,
+      message: "Sections fetched successfully",
+      data: sections,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
+
+// GET SECTION DETAILS BY SECTION ID - FUNCTION && LOGIC
+exports.getSectionById = async (req, res, next) => {
+  try {
+    const { sectionId } = req.params;
+    const user = await validateUser(req);
+
+    // VALID SECTION ID
+    if (!mongoose.Types.ObjectId.isValid(sectionId)) {
+      return next(new AppError("Invalid Section ID", 400));
+    }
+
+    const section = await Section.findById(sectionId);
+    if (!section) {
+      return next(new AppError("Section Not Found", 404));
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Section details fetched successfully",
+      data: section,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
+

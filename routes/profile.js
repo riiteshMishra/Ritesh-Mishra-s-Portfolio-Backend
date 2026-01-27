@@ -1,5 +1,12 @@
 const express = require("express");
 const AppError = require("../utils/appError");
+const createRateLimiter = require("../utils/rateLimiter");
+
+// 3 requests per minute
+const sectionLimiter = createRateLimiter({ max: 3 });
+
+// 10 requests per minute
+// const generalLimiter = createRateLimiter({ max: 10 });
 
 const {
   updateProfile,
@@ -16,7 +23,13 @@ const {
   deleteRequests,
 } = require("../controllers/Contact-us");
 const { uploadFileToCloudinary } = require("../utils/fileUploader");
-const { createSection, updateSection, deleteSection } = require("../controllers/BlogSection");
+const {
+  createSection,
+  updateSection,
+  deleteSection,
+  getSectionById,
+  getAllSectionsByBlog,
+} = require("../controllers/BlogSection");
 const router = express.Router();
 
 router.post("/update-profile", auth, updateProfile);
@@ -32,9 +45,31 @@ router.post("/form-status-update", auth, isAdmin, updateStatus);
 router.post("/delete-requests", auth, isAdmin, deleteRequests);
 
 // SECTION
-router.post("/create-section", auth, isAdmin, createSection);
-router.post("/update-section", auth, isAdmin, updateSection);
-router.delete("/delete-section/:sectionId", auth, isAdmin, deleteSection);
+router.post("/create-section", auth, isAdmin, sectionLimiter, createSection);
+router.post("/update-section", auth, isAdmin, sectionLimiter, updateSection);
+router.delete(
+  "/delete-section/:sectionId",
+  auth,
+  isAdmin,
+  sectionLimiter,
+  deleteSection,
+);
+router.get(
+  "/section/:sectionId",
+  auth,
+  isAdmin,
+  sectionLimiter,
+  getSectionById,
+);
+router.get(
+  "/sections/:blogId",
+  auth,
+  isAdmin,
+  sectionLimiter,
+  getAllSectionsByBlog,
+);
+
+// SUB-SECTION
 
 // local file upload and get cloud link
 router.post("/upload-file", auth, isAdmin, async (req, res, next) => {
