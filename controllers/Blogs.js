@@ -12,10 +12,10 @@ exports.createBlog = async (req, res, next) => {
     const userId = req.user.id;
     const user = await User.findById(userId);
     if (!user) return next(new AppError("Unauthorized access, user not found"));
-    let { title, slug, content, categoryId, tags, isPublished } = req.body;
+    let { title, slug, description, categoryId, tags, isPublished } = req.body;
     console.log("REQ.BODY", req.body);
     //validation
-    if (!title || !slug || !content || !categoryId || !tags)
+    if (!title || !slug || !description || !categoryId || !tags)
       return next(new AppError("All fields are required"));
 
     // Thumbnail
@@ -26,13 +26,13 @@ exports.createBlog = async (req, res, next) => {
       cloud_sub_folder.BLOG_THUMBNAIL_IMAGE
     );
 
-    if (!thumbnail?.success)
-      return next(new AppError("Thumbnail upload failed", 400));
+    // if (!thumbnail?.success)
+    //   return next(new AppError("Thumbnail upload failed", 400));
 
     // input data sanitize
     title = title.toString().toLowerCase().trim();
     slug = slug.toString().toLowerCase().trim();
-    content = content.toString().trim();
+    description = description.toString().trim();
     categoryId = categoryId.toString().trim();
 
     // Tags processing
@@ -52,7 +52,7 @@ exports.createBlog = async (req, res, next) => {
     const blog = await Blog.create({
       title: title,
       slug: slug,
-      content: content,
+      description: description,
       category: categoryId,
       tags: tags,
       isPublished: isPublished,
@@ -87,7 +87,7 @@ exports.updateBlogs = async (req, res, next) => {
   try {
     // console.log("REQ.BODY", req.body);
     if (!req.user.id) return next(new AppError("Unauthorized user not found"));
-    const { blogId, title, slug, content, categoryId, tags, isPublished } =
+    const { blogId, title, slug, description, categoryId, tags, isPublished } =
       req.body;
 
     if (!blogId) return next(new AppError("Blog id required", 400));
@@ -99,7 +99,7 @@ exports.updateBlogs = async (req, res, next) => {
     // Update only provided fields
     if (title) blog.title = title.toString().trim();
     if (slug) blog.slug = slug.toString().toLowerCase().trim();
-    if (content) blog.content = content.toString().trim();
+    if (description) blog.description = description.toString().trim();
     if (categoryId) blog.category = categoryId.toString().trim();
     if (isPublished) blog.isPublished = isPublished;
     if (tags) {
@@ -390,7 +390,7 @@ exports.getLikedBlogs = async (req, res, next) => {
 
     // Fetch all liked blogs (optional populate + sort)
     const likedBlogsDetails = await Blog.find({ _id: { $in: validBlogIds } })
-      .select("title thumbnail content author")
+      .select("title thumbnail description author")
       .populate("author", "firstName lastName image")
       .sort({ createdAt: -1 });
 
