@@ -21,7 +21,7 @@ const SubSectionSchema = new mongoose.Schema(
 
     text: {
       type: String,
-      trim: true,
+      // trim: true,
     },
 
     imageUrl: {

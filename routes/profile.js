@@ -30,6 +30,7 @@ const {
   getSectionById,
   getAllSectionsByBlog,
 } = require("../controllers/BlogSection");
+const { createSubSection } = require("../controllers/BlogSubSection");
 const router = express.Router();
 
 router.post("/update-profile", auth, updateProfile);
@@ -70,6 +71,7 @@ router.get(
 );
 
 // SUB-SECTION
+router.post("/create-sub-section", auth, isAdmin, createSubSection);
 
 // local file upload and get cloud link
 router.post("/upload-file", auth, isAdmin, async (req, res, next) => {
