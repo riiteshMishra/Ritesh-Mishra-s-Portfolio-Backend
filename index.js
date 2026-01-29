@@ -39,8 +39,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://riteshmishra.online",
   "https://www.riteshmishra.online",
-  "https://ritesh-mishra-s-portfolio-f-riteshmishra9565-gmailcoms-projects.vercel.app/",
-  "https://ritesh-mishra-s-portfolio-frondtend.vercel.app/",
+  "https://ritesh-mishra-s-portfolio-f-riteshmishra9565-gmailcoms-projects.vercel.app",
+  "https://ritesh-mishra-s-portfolio-frondtend.vercel.app",
 ];
 
 app.use(
@@ -53,7 +53,7 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   })

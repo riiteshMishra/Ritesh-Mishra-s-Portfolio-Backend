@@ -21,7 +21,7 @@ const sectionSchema = new mongoose.Schema(
       lowercase: true,
       required: true,
     },
-    subSection: [
+    subSections: [
       {
         type: mongoose.Types.ObjectId,
         ref: "SubSection",

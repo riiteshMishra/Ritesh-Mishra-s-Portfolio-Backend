@@ -30,7 +30,13 @@ const {
   getSectionById,
   getAllSectionsByBlog,
 } = require("../controllers/BlogSection");
-const { createSubSection } = require("../controllers/BlogSubSection");
+const {
+  createSubSection,
+  updateSubSection,
+  getSubSectionsBySectionId,
+  deleteSubSection,
+  getSubSection,
+} = require("../controllers/BlogSubSection");
 const router = express.Router();
 
 router.post("/update-profile", auth, updateProfile);
@@ -70,8 +76,27 @@ router.get(
   getAllSectionsByBlog,
 );
 
-// SUB-SECTION
-router.post("/create-sub-section", auth, isAdmin, createSubSection);
+// SUB-SECTION PROTECTED ROUTE
+router.post("/sub-sections", auth, isAdmin, sectionLimiter, createSubSection);
+
+router.patch("/sub-sections", auth, isAdmin, sectionLimiter, updateSubSection);
+
+router.delete(
+  "/sub-sections/:subSectionId",
+  auth,
+  isAdmin,
+  sectionLimiter,
+  deleteSubSection,
+);
+
+// SUB-SECTION OPEN ROUTE
+router.get("/sections/:sectionId/sub-sections", getSubSectionsBySectionId);
+
+router.get("/sub-sections/:subSectionId", getSubSection);
+
+// SUB-SECTION ROUTES END HERE
+
+
 
 // local file upload and get cloud link
 router.post("/upload-file", auth, isAdmin, async (req, res, next) => {
