@@ -19,13 +19,16 @@ exports.createSection = async (req, res, next) => {
       typeof sectionName !== "string"
     )
       return next(
-        new AppError("All Fields are required,please prove a valid data", 400),
+        new AppError(
+          "All Fields are required,please provide a valid data",
+          400,
+        ),
       );
 
     if (!req.user) return next(new AppError("Unauthorized access", 401));
 
     const { id: userId } = req.user;
-    console.log("user id", req.user);
+    // console.log("user id", req.user);
     // console.log("req", blogId, typeof sectionName);
 
     if (!mongoose.Types.ObjectId.isValid(blogId)) {
@@ -50,6 +53,8 @@ exports.createSection = async (req, res, next) => {
 
     // AB CREATE KRNA HAI SECTION - CREATE METHOD SE
     const createdSection = await SectionModel.create({
+      // author
+      // category
       blogId,
       sectionName,
       description,
@@ -66,10 +71,18 @@ exports.createSection = async (req, res, next) => {
       );
     }
 
+    //  Fetch updated blog with populated sections
+    const updatedBlog = await Blog.findById(blogId).populate({
+      path: "contents",
+      populate: {
+        path: "subSections",
+      },
+    });
+
     return res.status(201).json({
       success: true,
       message: "Section Created",
-      data: createdSection,
+      data: updatedBlog,
     });
   } catch (err) {
     return next(new AppError("INTERNAL SERVER ERROR", 500));
@@ -188,4 +201,3 @@ exports.getSectionById = async (req, res, next) => {
     return next(new AppError(err.message, 500));
   }
 };
-
