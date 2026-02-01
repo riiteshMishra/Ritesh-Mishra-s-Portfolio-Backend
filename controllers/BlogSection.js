@@ -112,10 +112,17 @@ exports.updateSection = async (req, res, next) => {
     // SECTION SAVE
     await section.save();
 
+    const updatedBlog = await Blog.findOne({ contents: sectionId }).populate({
+      path: "contents",
+      populate: {
+        path: "subSections",
+      },
+    });
+    
     return res.status(200).json({
       success: true,
       message: "Section Updated",
-      data: section,
+      data: updatedBlog,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));
@@ -132,6 +139,9 @@ exports.deleteSection = async (req, res, next) => {
     const section = await Section.findById(sectionId);
     if (!section) return next(new AppError("Section Not Found", 404));
 
+    // BLOG
+    const blog = await Blog.findById(section.blogId);
+
     // REMOVE SECTION ID FROM BLOG
     await Blog.findByIdAndUpdate(section.blogId, {
       $pull: { contents: sectionId },
@@ -139,9 +149,17 @@ exports.deleteSection = async (req, res, next) => {
 
     await Section.findByIdAndDelete(sectionId);
 
+    const updatedBlog = await Blog.findById(blog._id).populate({
+      path: "contents",
+      populate: {
+        path: "subSections",
+      },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Section Deleted",
+      data: updatedBlog,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));

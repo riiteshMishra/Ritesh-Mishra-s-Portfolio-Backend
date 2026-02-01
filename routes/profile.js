@@ -3,7 +3,7 @@ const AppError = require("../utils/appError");
 const createRateLimiter = require("../utils/rateLimiter");
 
 // 3 requests per minute
-const sectionLimiter = createRateLimiter({ max: 3 });
+const sectionLimiter = createRateLimiter({ max: 10 });
 
 // 10 requests per minute
 // const generalLimiter = createRateLimiter({ max: 10 });
