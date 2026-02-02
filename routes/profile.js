@@ -93,8 +93,8 @@ router.patch(
   updateSubSection,
 );
 
-router.delete(
-  "/sub-sections/:subSectionId",
+router.patch(
+  "/delete-subSection/:subSectionId",
   auth,
   isAdmin,
   sectionLimiter,

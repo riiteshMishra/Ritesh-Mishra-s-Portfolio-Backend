@@ -396,6 +396,9 @@ exports.deleteSubSection = async (req, res, next) => {
     const subSection = await SubSection.findById(subSectionId);
     if (!subSection) return next(new AppError("SubSection not found", 404));
 
+    //  SECTION FIND KRO OR US SECTION SE BLOG
+    const { sectionId } = subSection;
+
     // REMOVE SUB SECTION ID FROM SECTION
     await Section.findByIdAndUpdate(subSection.sectionId, {
       $pull: { subSections: subSectionId },
@@ -403,9 +406,24 @@ exports.deleteSubSection = async (req, res, next) => {
 
     // DELETE SUB SECTION
     await SubSection.findByIdAndDelete(subSectionId);
+
+    const updatedBlog = await Blog.findOne({
+      contents: sectionId,
+    }).populate({
+      path: "contents",
+      populate: {
+        path: "subSections",
+      },
+    });
+
+    if (!updatedBlog) {
+      return next(new AppError("Blog not found for this section", 404));
+    }
+
     return res.status(200).json({
       success: true,
       message: "Sub Section Deleted",
+      data: updatedBlog,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));
