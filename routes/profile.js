@@ -77,9 +77,21 @@ router.get(
 );
 
 // SUB-SECTION PROTECTED ROUTE
-router.post("/sub-sections", auth, isAdmin, sectionLimiter, createSubSection);
+router.post(
+  "/create-subSection",
+  auth,
+  isAdmin,
+  sectionLimiter,
+  createSubSection,
+);
 
-router.patch("/sub-sections", auth, isAdmin, sectionLimiter, updateSubSection);
+router.patch(
+  "/update-sub-section",
+  auth,
+  isAdmin,
+  sectionLimiter,
+  updateSubSection,
+);
 
 router.delete(
   "/sub-sections/:subSectionId",

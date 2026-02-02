@@ -4,6 +4,7 @@ const AppError = require("../utils/appError");
 const Section = require("../models/Section");
 const { uploadFileToCloudinary } = require("../utils/fileUploader");
 const validateUser = require("../utils/validateUser");
+const Blog = require("../models/Blogs");
 
 // CREATE SUB SECTION - FUNCTION && LOGIC
 exports.createSubSection = async (req, res, next) => {
@@ -148,10 +149,16 @@ exports.createSubSection = async (req, res, next) => {
       { new: true },
     );
 
+    const updatedBlog = await Blog.findOne({ contents: sectionId }).populate({
+      path: "contents",
+      populate: {
+        path: "subSections",
+      },
+    });
     return res.status(201).json({
       success: true,
       message: "Sub Section Created",
-      data: subSection,
+      data: updatedBlog,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));
@@ -287,10 +294,33 @@ exports.updateSubSection = async (req, res, next) => {
 
     await subSection.save();
 
+    //  SECTION FIND KRO OR US SECTION SE BLOG
+
+    const section = await Section.findOne({
+      subSections: subSectionId,
+    });
+
+    if (!section) {
+      return next(new AppError("Section not found for this sub section", 404));
+    }
+
+    const updatedBlog = await Blog.findOne({
+      contents: section._id,
+    }).populate({
+      path: "contents",
+      populate: {
+        path: "subSections",
+      },
+    });
+
+    if (!updatedBlog) {
+      return next(new AppError("Blog not found for this section", 404));
+    }
+
     return res.status(200).json({
       success: true,
       message: "Sub Section Updated",
-      data: subSection,
+      data: updatedBlog,
     });
   } catch (err) {
     return next(new AppError(err.message, 500));
