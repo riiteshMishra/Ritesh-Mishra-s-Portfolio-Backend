@@ -23,7 +23,7 @@ exports.createBlog = async (req, res, next) => {
     if (!thumbnail) return next(new AppError("Thumbnail is required", 400));
     thumbnail = await uploadFileToCloudinary(
       thumbnail,
-      cloud_sub_folder.BLOG_THUMBNAIL_IMAGE
+      cloud_sub_folder.BLOG_THUMBNAIL_IMAGE,
     );
 
     // if (!thumbnail?.success)
@@ -66,7 +66,7 @@ exports.createBlog = async (req, res, next) => {
       {
         $push: { blogs: blog._id },
       },
-      { new: true }
+      { new: true },
     );
 
     // user ke blogs array me blog ki id push
@@ -144,7 +144,7 @@ exports.deleteBlog = async (req, res, next) => {
       await Category.findByIdAndUpdate(
         blog.category,
         { $pull: { blogs: blog._id } },
-        { new: true }
+        { new: true },
       );
     }
 
@@ -165,7 +165,7 @@ exports.findAllBlogs = async (req, res, next) => {
   try {
     const allBlogs = await Blog.find({ isPublished: true }).populate(
       "author",
-      "name email"
+      "name email",
     );
 
     return res.status(200).json({
@@ -180,7 +180,6 @@ exports.findAllBlogs = async (req, res, next) => {
     return next(new AppError(err.message, 500));
   }
 };
-
 
 exports.toggleBlogLike = async (req, res, next) => {
   try {
@@ -261,7 +260,7 @@ exports.commentOnBlog = async (req, res, next) => {
 
     if (alreadyCommented)
       return next(
-        new AppError("This blog is already commented by this user", 400)
+        new AppError("This blog is already commented by this user", 400),
       );
     // update blog comments field
     const commentAddedBlog = await Blog.findByIdAndUpdate(
@@ -269,7 +268,7 @@ exports.commentOnBlog = async (req, res, next) => {
       {
         $addToSet: { comments: { user: userId, text: commentText } },
       },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json({
@@ -307,12 +306,12 @@ exports.updateComment = async (req, res, next) => {
     const updatedBlog = await Blog.findOneAndUpdate(
       { _id: blogId, "comments.user": userId },
       { $set: { "comments.$.text": commentText } },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedBlog) {
       return next(
-        new AppError("No comment found for this user on this blog", 404)
+        new AppError("No comment found for this user on this blog", 404),
       );
     }
 
@@ -351,6 +350,12 @@ exports.getBlogDetails = async (req, res, next) => {
       .populate({
         path: "comments.user",
         select: "firstName lastName",
+      })
+      .populate({
+        path: "contents",
+        populate: {
+          path: "subSections",
+        },
       });
 
     // blog not found?
@@ -381,7 +386,7 @@ exports.getLikedBlogs = async (req, res, next) => {
 
     // Filter out invalid IDs
     const validBlogIds = user.likedBlogs.filter((id) =>
-      mongoose.Types.ObjectId.isValid(id)
+      mongoose.Types.ObjectId.isValid(id),
     );
 
     if (validBlogIds.length === 0) {
