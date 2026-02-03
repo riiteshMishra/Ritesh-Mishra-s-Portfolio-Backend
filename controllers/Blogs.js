@@ -355,7 +355,7 @@ exports.getBlogDetails = async (req, res, next) => {
         path: "contents",
         populate: {
           path: "subSections",
-        },
+        }
       });
 
     // blog not found?
