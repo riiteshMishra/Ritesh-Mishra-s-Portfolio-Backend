@@ -21,7 +21,7 @@ router.put("/update-blog", auth, isAdmin, updateBlogs);
 router.delete("/delete-blog/:blogId", auth, isAdmin, deleteBlog);
 router.get("/get-all-blogs", findAllBlogs);
 router.get("/user-blogs", auth, isAdmin, userBlogs);
-router.get("/blog-details/:blogId", getBlogDetails);
+router.get("/blog-details/:slug", getBlogDetails);
 router.get('/get-liked-blogs',auth,getLikedBlogs)
 
 // comment

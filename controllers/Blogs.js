@@ -336,13 +336,13 @@ exports.deleteComment = async (req, res, next) => {
 // get blog details by id
 exports.getBlogDetails = async (req, res, next) => {
   try {
-    const { blogId } = req.params;
+    const { slug } = req.params;
     // validation
-    if (!mongoose.Types.ObjectId.isValid(blogId))
-      return next(new AppError("Invalid blog Id", 400));
+    if (typeof slug !== "string")
+      return next(new AppError("Invalid blog slug", 400));
 
     // find blog in db
-    const blog = await Blog.findById(blogId)
+    const blog = await Blog.findOne({ slug: slug })
       .populate({
         path: "author",
         select: "firstName lastName",
@@ -355,7 +355,7 @@ exports.getBlogDetails = async (req, res, next) => {
         path: "contents",
         populate: {
           path: "subSections",
-        }
+        },
       });
 
     // blog not found?
