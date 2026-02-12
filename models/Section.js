@@ -16,7 +16,7 @@ const sectionSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      maxLength: 150,
+      maxLength: 300,
       trim: true,
       lowercase: true,
       required: true,
