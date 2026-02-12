@@ -85,6 +85,7 @@ exports.createSection = async (req, res, next) => {
       data: updatedBlog,
     });
   } catch (err) {
+    console.log(err.message);
     return next(new AppError("INTERNAL SERVER ERROR", 500));
   }
 };
@@ -118,7 +119,7 @@ exports.updateSection = async (req, res, next) => {
         path: "subSections",
       },
     });
-    
+
     return res.status(200).json({
       success: true,
       message: "Section Updated",
