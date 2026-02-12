@@ -15,7 +15,7 @@ exports.uploadFileToCloudinary = async (file, path, quality) => {
 
     const response = await cloudinary.uploader.upload(
       file.tempFilePath,
-      options
+      options,
     );
     return {
       success: true,
@@ -32,5 +32,25 @@ exports.uploadFileToCloudinary = async (file, path, quality) => {
       error: err.message,
       path: "./utils/fileUploader",
     };
+  }
+};
+
+exports.destroyMedia = async (url) => {
+  try {
+    if (!url) return null;
+
+    const uploadIndex = url.indexOf("/upload/");
+    if (uploadIndex === -1) return null;
+
+    const publicPath = url.substring(uploadIndex + 8); // after /upload/
+    const withoutVersion = publicPath.split("/").slice(1).join("/");
+    const publicId = withoutVersion.split(".")[0];
+    console.log("public id", publicId);
+    // const result = await cloudinary.uploader.destroy(publicId);
+    const result = "hi";
+    return result;
+  } catch (err) {
+    console.error("Destroy Media Error:", err);
+    return null;
   }
 };

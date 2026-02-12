@@ -3,7 +3,10 @@ const Blog = require("../models/Blogs");
 const Category = require("../models/Category");
 const User = require("../models/User");
 const AppError = require("../utils/appError");
-const { uploadFileToCloudinary } = require("../utils/fileUploader");
+const {
+  uploadFileToCloudinary,
+  destroyMedia,
+} = require("../utils/fileUploader");
 const { cloud_sub_folder } = require("../utils/varHelper");
 
 // create blogs
@@ -139,17 +142,22 @@ exports.deleteBlog = async (req, res, next) => {
     const blog = await Blog.findById(blogId);
     if (!blog) return next(new AppError("Blog not found"));
 
-    // is blog ko us category se pull kr do
-    if (blog.category) {
-      await Category.findByIdAndUpdate(
-        blog.category,
-        { $pull: { blogs: blog._id } },
-        { new: true },
-      );
+    // MEDIA FIND KRO
+    if (blog.thumbnail) {
+      const result = await destroyMedia(blog?.thumbnail);
+      console.log(result);
     }
+    // is blog ko us category se pull kr do
+    // if (blog.category) {
+    //   await Category.findByIdAndUpdate(
+    //     blog.category,
+    //     { $pull: { blogs: blog._id } },
+    //     { new: true },
+    //   );
+    // }
 
     // delete blog
-    await Blog.findByIdAndDelete(blogId);
+    // await Blog.findByIdAndDelete(blogId);
 
     return res.status(200).json({
       success: true,
