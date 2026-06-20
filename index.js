@@ -17,6 +17,7 @@ const blogRoutes = require("./routes/blog");
 const rateLimit = require("express-rate-limit");
 const reviewRoute = require("./routes/Reviews");
 const fileuploadRoute = require("./routes/uploadFile");
+const sitemapRoute = require("./routes/sitemap.route")
 
 // 2) App Config
 const PORT = process.env.PORT || 4000;
@@ -36,7 +37,7 @@ app.use(cookieParser());
 
 // Allowed origin
 const allowedOrigins = [
-  "http://localhost:5173",
+  // "http://localhost:5173",
   "https://riteshmishra.online",
   "https://www.riteshmishra.online",
   "https://ritesh-mishra-s-portfolio-f-riteshmishra9565-gmailcoms-projects.vercel.app",
@@ -53,7 +54,7 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
-    methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -74,6 +75,7 @@ app.use("/api/v1/projects", projectsRoutes);
 app.use("/api/v1/blogs", blogRoutes);
 app.use("/api/v1/reviews", reviewRoute);
 app.use("/api/v1/upload/", fileuploadRoute);
+app.use("/", sitemapRoute);
 // global config
 app.use(errorHandler);
 
