@@ -83,6 +83,14 @@ exports.signup = async (req, res) => {
     password = password.trim();
     confirmPassword = confirmPassword.trim();
 
+
+    // ACCOUNT TYPE CHECK
+    if (accountType === "admin")
+      return res.status(403).json({
+        success: false,
+        message: "Admin accounts cannot be created via signup",
+      });
+
     // password !== confirmPassword return
     if (password !== confirmPassword)
       return res.status(400).json({
